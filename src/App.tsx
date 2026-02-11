@@ -108,7 +108,7 @@ function App() {
   };
 
   return (
-    <div className={styles.shell}>
+    <>
       <TopBar
         isLoggedIn={Boolean(user)}
         onBrandClick={() => setView(user ? 'home' : 'landing')}
@@ -161,7 +161,7 @@ function App() {
           />
         )}
       </main>
-    </div>
+    </>
   );
 }
 

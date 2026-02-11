@@ -12,10 +12,9 @@ type TopBarProps = {
 function TopBar({ isLoggedIn, onBrandClick, onSignIn, onSignUp, onLogout }: TopBarProps) {
   return (
     <header className={styles.header}>
-      <div className={styles.row}>
+      <div className={styles.navbar}>
         <button type="button" className={styles.brandButton} onClick={onBrandClick}>
           <span className={styles.brand}>TalentForge AI</span>
-          <span className={styles.tag}>Intelligent Job Matching & Recruiter Screening Platform</span>
         </button>
         <div className={styles.actions}>
           {!isLoggedIn && (

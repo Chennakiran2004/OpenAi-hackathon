@@ -163,6 +163,17 @@ const recruiterCss = `
   font-size: 0.8rem;
 }
 
+/* Technical metrics - JetBrains Mono */
+.rh-technical-metric,
+.rh-score,
+.rh-percentage,
+.rh-rank,
+.rh-eta,
+.rh-throughput {
+  font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-feature-settings: 'liga' 1, 'calt' 1;
+}
+
 @media (max-width: 1024px) {
   .rh-two-col,
   .rh-form-grid {
@@ -200,5 +211,11 @@ export const recruiterHomeStyles = {
   blindToggle: 'rh-blind-toggle',
   tableWrap: 'rh-table-wrap',
   table: 'rh-table',
-  smallText: 'rh-small'
+  smallText: 'rh-small',
+  technicalMetric: 'rh-technical-metric',
+  score: 'rh-score',
+  percentage: 'rh-percentage',
+  rank: 'rh-rank',
+  eta: 'rh-eta',
+  throughput: 'rh-throughput'
 };

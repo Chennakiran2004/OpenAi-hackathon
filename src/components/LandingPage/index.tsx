@@ -1,5 +1,7 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import { motion } from 'framer-motion';
 import * as S from './stylecomponent';
+import Antigravity from '../Antigravity';
 
 type LandingPageProps = {
   onRecruiterSignUp: () => void;
@@ -10,231 +12,316 @@ type LandingPageProps = {
 type FeatureCardProps = {
   title: string;
   description: string;
+  icon?: string;
+  delay?: number;
 };
 
-type SectionCTAProps = {
-  title: string;
-  description: string;
-  actionLabel: string;
-  onAction: () => void;
+type AnimatedSectionProps = {
+  children: React.ReactNode;
+  delay?: number;
 };
 
-function FeatureCard({ title, description }: FeatureCardProps) {
+// Custom hook for scroll animations
+function useScrollAnimation() {
+  const [isVisible, setIsVisible] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (ref.current) {
+      observer.observe(ref.current);
+    }
+
+    return () => {
+      if (ref.current) {
+        observer.unobserve(ref.current);
+      }
+    };
+  }, []);
+
+  return [ref, isVisible] as const;
+}
+
+// Animated section wrapper
+function AnimatedSection({ children, delay = 0 }: AnimatedSectionProps) {
+  const [ref, isVisible] = useScrollAnimation();
+
   return (
-    <S.FeatureCard>
+    <S.AnimatedSection ref={ref} $isVisible={isVisible} $delay={delay}>
+      {children}
+    </S.AnimatedSection>
+  );
+}
+
+function AnimatedMetric({ stat, label, delay = 0 }: { stat: string; label: string; delay?: number }) {
+  const numericValue = parseFloat(stat.replace(/[^0-9.]/g, ''));
+  const hasNumber = !isNaN(numericValue);
+  const suffix = stat.replace(/[0-9.]/g, '');
+
+  const [sectionRef, isVisible] = useScrollAnimation();
+  const [count, setCount] = useState(hasNumber ? 0 : stat);
+
+  useEffect(() => {
+    if (!isVisible || !hasNumber) return;
+
+    let startTime: number | null = null;
+    const duration = 2000;
+    const animate = (currentTime: number) => {
+      if (!startTime) startTime = currentTime;
+      const progress = Math.min((currentTime - startTime) / duration, 1);
+      const easeOutQuart = 1 - Math.pow(1 - progress, 4);
+      setCount(Math.floor(numericValue * easeOutQuart));
+
+      if (progress < 1) {
+        requestAnimationFrame(animate);
+      } else {
+        setCount(numericValue);
+      }
+    };
+
+    requestAnimationFrame(animate);
+  }, [isVisible, hasNumber, numericValue]);
+
+  return (
+    <S.MetricCard ref={sectionRef} $delay={delay} $isVisible={isVisible}>
+      <S.MetricValue>
+        {hasNumber ? `${count}${suffix}` : stat}
+      </S.MetricValue>
+      <S.MetricLabel>{label}</S.MetricLabel>
+    </S.MetricCard>
+  );
+}
+
+function FeatureCard({ title, description, delay = 0 }: FeatureCardProps) {
+  const [ref, isVisible] = useScrollAnimation();
+
+  return (
+    <S.FeatureCard ref={ref} $isVisible={isVisible} $delay={delay}>
+      <S.FeatureIcon>✨</S.FeatureIcon>
       <S.FeatureTitle>{title}</S.FeatureTitle>
       <S.FeatureBody>{description}</S.FeatureBody>
     </S.FeatureCard>
   );
 }
 
-function SectionCTA({ title, description, actionLabel, onAction }: SectionCTAProps) {
-  return (
-    <S.FinalCTA aria-labelledby="final-cta-title">
-      <S.FinalTitle id="final-cta-title">{title}</S.FinalTitle>
-      <S.FinalBody>{description}</S.FinalBody>
-      <S.SpacerButton type="button" onClick={onAction}>
-        {actionLabel}
-      </S.SpacerButton>
-    </S.FinalCTA>
-  );
-}
-
 function Hero({ onPrimaryClick, onSecondaryClick, onSignIn }: { onPrimaryClick: () => void; onSecondaryClick: () => void; onSignIn: () => void }) {
+  const titleText = "Hire Smarter. Screen Faster. Stay Fair.";
+  const words = titleText.split(" ");
+
   return (
-    <S.HeroLayout aria-labelledby="hero-title">
-      <S.HeroPanel>
-        <S.Eyebrow>TalentForge AI</S.Eyebrow>
-        <S.HeroTitle id="hero-title">Hire Smarter. Screen Faster. Stay Fair.</S.HeroTitle>
-        <S.HeroSubtitle>
-          TalentForge AI helps hiring teams rank candidates with explainable signals so decisions are fast, consistent, and easier to defend.
-        </S.HeroSubtitle>
+    <S.HeroSectionNew>
+      <S.BorderLeft />
+      <S.BorderRight />
+      <S.BorderBottom />
 
-        <S.TrustList>
-          <S.TrustItem>
-            <S.Dot />
-            <span>
-              <S.TrustLabel>Speed:</S.TrustLabel> review qualified candidates in minutes, not days.
-            </span>
-          </S.TrustItem>
-          <S.TrustItem>
-            <S.Dot />
-            <span>
-              <S.TrustLabel>Explainability:</S.TrustLabel> clear score drivers for every ranked profile.
-            </span>
-          </S.TrustItem>
-          <S.TrustItem>
-            <S.Dot />
-            <span>
-              <S.TrustLabel>Fairness:</S.TrustLabel> blind-screening mode reduces identity-based bias.
-            </span>
-          </S.TrustItem>
-        </S.TrustList>
+      <S.HeroContentNew>
+        <S.HeroBadge>
+          <S.BadgeDot />
+          TalentForge AI
+        </S.HeroBadge>
 
-        <S.CTAGroup>
+        <S.HeroTitleNew>
+          {words.map((word, index) => (
+            <motion.span
+              key={index}
+              initial={{ opacity: 0, filter: "blur(4px)", y: 10 }}
+              animate={{ opacity: 1, filter: "blur(0px)", y: 0 }}
+              transition={{
+                duration: 0.3,
+                delay: index * 0.1,
+                ease: "easeInOut",
+              }}
+              className="mr-2 inline-block"
+            >
+              {word}
+            </motion.span>
+          ))}
+        </S.HeroTitleNew>
+
+        <S.HeroSubtitleNew
+          as={motion.p}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.3, delay: 0.8 }}
+        >
+          Transform your hiring process with AI-powered candidate screening that's fast, transparent, and fair.
+        </S.HeroSubtitleNew>
+
+        <S.CTAGroupNew
+          as={motion.div}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.3, delay: 1 }}
+        >
           <S.ButtonPrimary type="button" onClick={onPrimaryClick}>
-            Upload Resumes and Start Screening
+            Get Started Free
           </S.ButtonPrimary>
           <S.ButtonSecondary type="button" onClick={onSecondaryClick}>
-            Explore Candidate Experience
+            See How It Works
           </S.ButtonSecondary>
-        </S.CTAGroup>
+        </S.CTAGroupNew>
 
-        <S.SignInRow>
+        <S.SignInRowNew
+          as={motion.p}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.3, delay: 1.2 }}
+        >
           Already have an account?{' '}
           <S.SignInLink type="button" onClick={onSignIn}>
             Sign in
           </S.SignInLink>
-        </S.SignInRow>
-      </S.HeroPanel>
+        </S.SignInRowNew>
 
-      <S.HeroVisual>
-        <div>
-          <S.VisualLabel>Trusted Hiring Outcomes</S.VisualLabel>
-          <S.VisualTitle>From resume overload to confident shortlists</S.VisualTitle>
-        </div>
-        <S.VisualGrid>
-          <S.VisualStat>
-            <S.VisualValue>70%</S.VisualValue>
-            <S.VisualMeta>faster first-round screening</S.VisualMeta>
-          </S.VisualStat>
-          <S.VisualStat>
-            <S.VisualValue>80%+</S.VisualValue>
-            <S.VisualMeta>shortlist precision in pilot roles</S.VisualMeta>
-          </S.VisualStat>
-          <S.VisualStat>
-            <S.VisualValue>100%</S.VisualValue>
-            <S.VisualMeta>transparent AI score rationale</S.VisualMeta>
-          </S.VisualStat>
-          <S.VisualStat>
-            <S.VisualValue>500</S.VisualValue>
-            <S.VisualMeta>resumes processed in a demo run</S.VisualMeta>
-          </S.VisualStat>
-        </S.VisualGrid>
-      </S.HeroVisual>
-    </S.HeroLayout>
+        <S.HeroImageContainer
+          as={motion.div}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3, delay: 1.2 }}
+        >
+          <S.HeroImageWrapper>
+            <img
+              src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=1200&h=600&fit=crop"
+              alt="AI-powered hiring platform"
+            />
+          </S.HeroImageWrapper>
+        </S.HeroImageContainer>
+      </S.HeroContentNew>
+    </S.HeroSectionNew>
   );
 }
 
 function LandingPage({ onRecruiterSignUp, onStudentSignUp, onSignIn }: LandingPageProps) {
   const metrics = [
-    { stat: '70%', label: 'Reduction in screening time' },
-    { stat: '500', label: 'Resumes processed in one run' },
-    { stat: '80%+', label: 'Shortlist precision across hiring roles' },
-    { stat: '100%', label: 'Explainable AI scoring visibility' }
+    { stat: '70%', label: 'Faster screening time' },
+    { stat: '500+', label: 'Resumes processed per hour' },
+    { stat: '80%+', label: 'Shortlist precision' },
+    { stat: '100%', label: 'Transparent AI scoring' }
   ];
 
-  const painPoints = [
-    'Too many resumes for lean recruiting teams',
-    'Keyword-based ATS filters reject strong candidates',
-    'Bias risk in name, college, or profile-based reviews',
-    'Slow and inconsistent hiring cycles'
+  const features = [
+    {
+      title: 'Explainable AI',
+      description: 'Every ranking decision comes with clear, understandable reasoning you can trust and defend.'
+    },
+    {
+      title: 'Blind Screening',
+      description: 'Reduce unconscious bias by hiding identity information during initial evaluation.'
+    },
+    {
+      title: 'Bulk Processing',
+      description: 'Handle hundreds to thousands of resumes with consistent quality and speed.'
+    },
+    {
+      title: 'Smart Matching',
+      description: 'AI understands context and skills, not just keywords, for better candidate fit.'
+    }
   ];
 
   const steps = [
-    { title: 'Upload resumes', description: 'Drop ZIP folders, PDFs, or CSV exports directly from your ATS.' },
-    { title: 'AI semantic matching', description: 'TalentForge scores role fit through skills and context, not simple keyword matching.' },
-    { title: 'Transparent ranking', description: 'Review ranked candidates with clear reasoning, confidence levels, and skill gaps.' }
+    {
+      number: '01',
+      title: 'Upload Resumes',
+      description: 'Simply drag and drop your resume files or connect your ATS. We support PDF, DOCX, and CSV formats.'
+    },
+    {
+      number: '02',
+      title: 'AI Analysis',
+      description: 'Our AI analyzes each resume for skills, experience, and role fit using semantic understanding.'
+    },
+    {
+      number: '03',
+      title: 'Get Results',
+      description: 'Receive ranked candidates with transparent scoring and actionable insights in minutes.'
+    }
   ];
 
   return (
     <S.Page>
-      <S.ResponsiveStyles>
-        <S.Container>
-          <Hero onPrimaryClick={onRecruiterSignUp} onSecondaryClick={onStudentSignUp} onSignIn={onSignIn} />
+      <S.AntigravityWrapper>
+        <Antigravity
+          count={100}
+          magnetRadius={8}
+          ringRadius={10}
+          waveSpeed={0.2}
+          waveAmplitude={0.2}
+          particleSize={0.5}
+          lerpSpeed={0.1}
+          color="#666666"
+          autoAnimate={false}
+          particleVariance={1}
+          rotationSpeed={0.4}
+          depthFactor={0.4}
+          pulseSpeed={3}
+          particleShape="tetrahedron"
+          fieldStrength={10}
+        />
+      </S.AntigravityWrapper>
+      <S.Container>
+        <Hero onPrimaryClick={onRecruiterSignUp} onSecondaryClick={onStudentSignUp} onSignIn={onSignIn} />
 
-          <S.MetricsStrip as="section" aria-label="Social proof metrics">
-            {metrics.map((metric) => (
-              <S.MetricCard key={metric.label}>
-                <S.MetricValue>{metric.stat}</S.MetricValue>
-                <S.MetricLabel>{metric.label}</S.MetricLabel>
-              </S.MetricCard>
+        <AnimatedSection delay={0.1}>
+          <S.MetricsSection>
+            {metrics.map((metric, index) => (
+              <AnimatedMetric key={metric.label} stat={metric.stat} label={metric.label} delay={index * 0.1} />
             ))}
-          </S.MetricsStrip>
+          </S.MetricsSection>
+        </AnimatedSection>
 
-          <S.Surface as="section" aria-labelledby="problem-section-title">
-            <S.ProblemGrid>
-              <article>
-                <S.SectionTitle id="problem-section-title">Hiring teams are overloaded while top talent gets missed.</S.SectionTitle>
-                <S.SectionBody>
-                  Traditional screening workflows are slow, opaque, and inconsistent. TalentForge replaces black-box ranking with transparent decisions you can explain to
-                  leadership and candidates.
-                </S.SectionBody>
-                <S.PainList>
-                  {painPoints.map((point) => (
-                    <S.PainItem key={point}>
-                      <S.Dot />
-                      <span>{point}</span>
-                    </S.PainItem>
-                  ))}
-                </S.PainList>
-              </article>
-
-              <S.BeforeCard>
-                <S.BeforeLabel>Before TalentForge</S.BeforeLabel>
-                <S.BeforeStack>
-                  <S.BeforeItem>
-                    <S.BeforeItemTitle>2,400 resumes waiting</S.BeforeItemTitle>
-                    <S.BeforeItemText>Manual review queue growing for 12 days</S.BeforeItemText>
-                  </S.BeforeItem>
-                  <S.BeforeItem>
-                    <S.BeforeItemTitle>ATS keyword misses</S.BeforeItemTitle>
-                    <S.BeforeItemText>Strong candidates dropped because of wording mismatch</S.BeforeItemText>
-                  </S.BeforeItem>
-                  <S.BeforeItem>
-                    <S.BeforeItemTitle>Unclear decisions</S.BeforeItemTitle>
-                    <S.BeforeItemText>Hiring panels cannot defend why candidates were rejected</S.BeforeItemText>
-                  </S.BeforeItem>
-                </S.BeforeStack>
-              </S.BeforeCard>
-            </S.ProblemGrid>
-          </S.Surface>
-
-          <S.Surface as="section" aria-labelledby="how-it-works-title">
-            <S.SectionTitle id="how-it-works-title">How it works</S.SectionTitle>
+        <AnimatedSection delay={0.2}>
+          <S.Section>
+            <S.SectionHeader>
+              <S.SectionTitle>How It Works</S.SectionTitle>
+              <S.SectionSubtitle>Three simple steps to transform your hiring process</S.SectionSubtitle>
+            </S.SectionHeader>
             <S.StepsGrid>
               {steps.map((step, index) => (
-                <S.StepCard key={step.title}>
-                  <S.StepLabel>Step {index + 1}</S.StepLabel>
-                  <S.StepTitle>{step.title}</S.StepTitle>
-                  <S.StepBody>{step.description}</S.StepBody>
-                </S.StepCard>
+                <AnimatedSection key={step.number} delay={index * 0.15}>
+                  <S.StepCard>
+                    <S.StepNumber>{step.number}</S.StepNumber>
+                    <S.StepTitle>{step.title}</S.StepTitle>
+                    <S.StepBody>{step.description}</S.StepBody>
+                  </S.StepCard>
+                </AnimatedSection>
               ))}
             </S.StepsGrid>
-          </S.Surface>
+          </S.Section>
+        </AnimatedSection>
 
-          <S.Surface as="section" aria-labelledby="feature-highlights-title">
-            <S.SectionTitle id="feature-highlights-title">Feature highlights</S.SectionTitle>
+        <AnimatedSection delay={0.3}>
+          <S.Section>
+            <S.SectionHeader>
+              <S.SectionTitle>Powerful Features</S.SectionTitle>
+              <S.SectionSubtitle>Everything you need for smarter, fairer hiring</S.SectionSubtitle>
+            </S.SectionHeader>
             <S.FeaturesGrid>
-              <FeatureCard title="Explainable AI scoring" description="Each score includes plain-language evidence for ranking decisions." />
-              <FeatureCard title="Blind screening mode" description="Hide identity fields to reduce unconscious bias in early evaluation." />
-              <FeatureCard title="Bulk resume processing" description="Screen from 100 to 10,000 resumes with stable throughput and quality." />
-              <FeatureCard title="Export-ready outputs" description="Export ranked shortlists and score breakdowns for ATS workflows." />
+              {features.map((feature, index) => (
+                <FeatureCard key={feature.title} title={feature.title} description={feature.description} delay={index * 0.1} />
+              ))}
             </S.FeaturesGrid>
-          </S.Surface>
+          </S.Section>
+        </AnimatedSection>
 
-          <S.PersonaGrid as="section" aria-labelledby="persona-title">
-            <S.VisuallyHidden id="persona-title">Platform outcomes by audience</S.VisuallyHidden>
-            <S.RecruiterCard>
-              <S.PersonaLabel>For Recruiters</S.PersonaLabel>
-              <S.PersonaTitle>Save hours and defend every shortlist</S.PersonaTitle>
-              <S.PersonaBody>Cut first-round screening by 70%, prioritize top-fit candidates, and provide transparent reasons to your team.</S.PersonaBody>
-            </S.RecruiterCard>
-            <S.CandidateCard>
-              <S.PersonaLabel>For Candidates</S.PersonaLabel>
-              <S.PersonaTitle>Get evaluated on skill and role fit</S.PersonaTitle>
-              <S.PersonaBody>Blind screening enables fairer visibility while skill-gap insights help candidates improve over time.</S.PersonaBody>
-            </S.CandidateCard>
-          </S.PersonaGrid>
-
-          <SectionCTA
-            title="Fair hiring should not be a black box."
-            description="Build faster, cleaner, and more defensible hiring pipelines with explainable AI that your team can trust."
-            actionLabel="Start Screening Smarter"
-            onAction={onRecruiterSignUp}
-          />
-        </S.Container>
-      </S.ResponsiveStyles>
+        <AnimatedSection delay={0.4}>
+          <S.CTASection>
+            <S.CTATitle>Ready to Transform Your Hiring?</S.CTATitle>
+            <S.CTADescription>
+              Join forward-thinking teams using AI to make hiring faster, fairer, and more transparent.
+            </S.CTADescription>
+            <S.CTAButton type="button" onClick={onRecruiterSignUp}>
+              Start Free Trial
+            </S.CTAButton>
+          </S.CTASection>
+        </AnimatedSection>
+      </S.Container>
     </S.Page>
   );
 }

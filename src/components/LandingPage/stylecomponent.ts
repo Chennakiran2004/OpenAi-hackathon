@@ -1,163 +1,485 @@
-import styled from 'styled-components';
+import styled, { keyframes, css } from 'styled-components';
 
+// Animation keyframes
+const fadeInUp = keyframes`
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+`;
+
+const fadeIn = keyframes`
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+`;
+
+const float = keyframes`
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+`;
+
+const gradientShift = keyframes`
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+`;
+
+const pulse = keyframes`
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+`;
+
+// Base page styles
 export const Page = styled.div`
-  --tf-bg-page: #f5f7fb;
-  --tf-bg-surface: #ffffff;
-  --tf-bg-soft: #f8fbff;
-  --tf-text-primary: #122137;
-  --tf-text-secondary: #405266;
-  --tf-text-muted: #5f7287;
-  --tf-border-subtle: rgba(18, 33, 55, 0.12);
-  --tf-shadow-card: 0 18px 36px rgba(12, 25, 44, 0.08);
-  --tf-shadow-hover: 0 22px 40px rgba(12, 25, 44, 0.12);
-  --tf-accent: #0b6b63;
-  --tf-trust: #132748;
+  --tf-bg-page: #111111;
+  --tf-bg-surface: #282828;
+  --tf-bg-soft: #282828;
+  --tf-text-primary: #E0E0E0;
+  --tf-text-secondary: #E0E0E0;
+  --tf-text-muted: #999999;
+  --tf-accent: #666666;
+  --tf-accent-light: #888888;
+  --tf-accent-hover: #555555;
+  --tf-accent-secondary: #666666;
+  --tf-primary: #000000;
+  --tf-border-subtle: rgba(102, 102, 102, 0.3);
+  --tf-border-medium: rgba(102, 102, 102, 0.5);
+  --tf-border: rgba(102, 102, 102, 0.3);
+  --tf-disabled: rgba(102, 102, 102, 0.4);
+  --tf-focus-ring: #888888;
+  --tf-shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.5);
+  --tf-shadow-md: 0 4px 16px rgba(0, 0, 0, 0.6);
+  --tf-shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.7);
+  
+  min-height: 100vh;
+  background: var(--tf-bg-page);
   color: var(--tf-text-primary);
-  background:
-    radial-gradient(circle at 5% 5%, rgba(11, 107, 99, 0.1), transparent 36%),
-    radial-gradient(circle at 90% 18%, rgba(35, 84, 160, 0.08), transparent 42%),
-    var(--tf-bg-page);
+  position: relative;
+  overflow-x: hidden;
+
+  &::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+      radial-gradient(circle at 20% 30%, rgba(102, 102, 102, 0.05), transparent 50%),
+      radial-gradient(circle at 80% 70%, rgba(102, 102, 102, 0.03), transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+`;
+
+export const AntigravityWrapper = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.3;
+
+  & > * {
+    width: 100%;
+    height: 100%;
+  }
 `;
 
 export const Container = styled.div`
-  max-width: 1140px;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 1.25rem;
+  padding: 2rem 1.5rem;
+  position: relative;
+  z-index: 1;
+
+  @media (max-width: 768px) {
+    padding: 1.5rem 1rem;
+  }
+`;
+
+// Animated section wrapper
+type AnimatedSectionProps = {
+  $isVisible: boolean;
+  $delay?: number;
+};
+
+export const AnimatedSection = styled.div<AnimatedSectionProps>`
+  opacity: ${props => (props.$isVisible ? 1 : 0)};
+  transform: ${props => (props.$isVisible ? 'translateY(0)' : 'translateY(30px)')};
+  transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+  transition-delay: ${props => `${props.$delay || 0}s`};
+`;
+
+// Hero Section
+export const HeroSection = styled.section`
   display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  align-items: center;
+  margin-bottom: 6rem;
+  min-height: 70vh;
+  padding: 2rem 0;
+
+  @media (max-width: 968px) {
+    grid-template-columns: 1fr;
+    gap: 3rem;
+    margin-bottom: 4rem;
+    min-height: auto;
+  }
+`;
+
+// New Hero Section with Border Decorations
+export const HeroSectionNew = styled.section`
+  position: relative;
+  max-width: 1280px;
+  margin: 2.5rem auto 6rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2.5rem 1rem;
+
+  @media (max-width: 768px) {
+    padding: 1.5rem 1rem;
+    margin: 1.5rem auto 4rem;
+  }
+`;
+
+export const BorderLeft = styled.div`
+  position: absolute;
+  inset-y: 0;
+  left: 0;
+  height: 100%;
+  width: 1px;
+  background: var(--tf-border-subtle);
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    height: 160px;
+    width: 1px;
+    background: linear-gradient(to bottom, transparent, var(--tf-accent), transparent);
+  }
+`;
+
+export const BorderRight = styled.div`
+  position: absolute;
+  inset-y: 0;
+  right: 0;
+  height: 100%;
+  width: 1px;
+  background: var(--tf-border-subtle);
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    height: 160px;
+    width: 1px;
+    background: linear-gradient(to bottom, transparent, var(--tf-accent), transparent);
+  }
+`;
+
+export const BorderBottom = styled.div`
+  position: absolute;
+  inset-x: 0;
+  bottom: 0;
+  height: 1px;
+  width: 100%;
+  background: var(--tf-border-subtle);
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    height: 1px;
+    width: 160px;
+    background: linear-gradient(to right, transparent, var(--tf-accent), transparent);
+  }
+`;
+
+export const HeroContentNew = styled.div`
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  text-align: center;
+  padding: 2.5rem 0;
+
+  @media (max-width: 768px) {
+    padding: 1.5rem 0;
+  }
+`;
+
+export const HeroTitleNew = styled.h1`
+  position: relative;
+  z-index: 10;
+  max-width: 1024px;
+  margin: 0 auto 1.5rem;
+  text-align: center;
+  font-size: clamp(1.5rem, 4vw, 4.5rem);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: #ffffff;
+
+  @media (max-width: 768px) {
+    font-size: clamp(1.5rem, 5vw, 2.5rem);
+  }
+`;
+
+export const HeroSubtitleNew = styled.p`
+  position: relative;
+  z-index: 10;
+  max-width: 672px;
+  margin: 0 auto 2rem;
+  padding: 1rem 0;
+  text-align: center;
+  font-size: 1.125rem;
+  line-height: 1.7;
+  font-weight: 400;
+  color: rgba(203, 213, 225, 0.9);
+`;
+
+export const CTAGroupNew = styled.div`
+  position: relative;
+  z-index: 10;
+  margin-top: 2rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
   gap: 1rem;
 `;
 
-export const Surface = styled.section`
-  background: var(--tf-bg-surface);
+export const SignInRowNew = styled.p`
+  position: relative;
+  z-index: 10;
+  color: var(--tf-text-muted);
+  font-size: 0.9375rem;
+  margin: 1.5rem 0 0;
+  text-align: center;
+`;
+
+export const HeroImageContainer = styled.div`
+  position: relative;
+  z-index: 10;
+  margin-top: 5rem;
+  border-radius: 24px;
   border: 1px solid var(--tf-border-subtle);
-  border-radius: 16px;
-  box-shadow: var(--tf-shadow-card);
-  padding: 1.4rem;
-`;
-
-export const HeroLayout = styled.section`
-  display: grid;
-  grid-template-columns: 1.15fr 0.85fr;
-  gap: 1rem;
-`;
-
-export const HeroPanel = styled.article`
   background: var(--tf-bg-surface);
+  padding: 1rem;
+  box-shadow: var(--tf-shadow-md);
+
+  @media (max-width: 768px) {
+    margin-top: 3rem;
+    padding: 0.75rem;
+  }
+`;
+
+export const HeroImageWrapper = styled.div`
+  width: 100%;
+  overflow: hidden;
+  border-radius: 12px;
   border: 1px solid var(--tf-border-subtle);
-  border-radius: 16px;
-  box-shadow: var(--tf-shadow-card);
-  padding: 1.55rem;
+
+  img {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    display: block;
+    aspect-ratio: 16 / 9;
+  }
 `;
 
-export const HeroVisual = styled(HeroPanel)`
-  background: linear-gradient(160deg, #132748, #204170);
-  color: #ecf7ff;
-  border-color: rgba(236, 247, 255, 0.16);
-  display: grid;
-  align-content: space-between;
-  gap: 1rem;
+export const HeroContent = styled.div`
+  animation: ${fadeInUp} 0.8s ease-out;
 `;
 
-export const Eyebrow = styled.p`
-  margin: 0;
-  color: var(--tf-accent);
+export const HeroBadge = styled.div`
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: rgba(102, 102, 102, 0.15);
+  border: 1px solid var(--tf-border-subtle);
+  border-radius: 50px;
+  font-size: 0.75rem;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  font-size: 0.76rem;
-  font-weight: 800;
+  color: var(--tf-accent);
+  margin-bottom: 2rem;
+`;
+
+export const BadgeDot = styled.span`
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--tf-accent-light);
+  animation: ${pulse} 2s ease-in-out infinite;
 `;
 
 export const HeroTitle = styled.h1`
-  margin: 0.65rem 0 0;
-  color: var(--tf-trust);
-  font-size: clamp(2rem, 4.6vw, 3.35rem);
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-weight: 800;
+  line-height: 1.1;
   letter-spacing: -0.02em;
-  line-height: 1.06;
+  color: var(--tf-text-primary);
+  margin: 0 0 1.5rem 0;
+  animation: ${fadeInUp} 0.8s ease-out 0.2s both;
+`;
+
+export const HeroTitleAccent = styled.span`
+  color: var(--tf-accent);
 `;
 
 export const HeroSubtitle = styled.p`
-  margin: 0.95rem 0 0;
+  font-size: 1.125rem;
+  line-height: 1.7;
   color: var(--tf-text-secondary);
-  line-height: 1.65;
-  font-size: 0.98rem;
-  max-width: 62ch;
+  margin: 0 0 2.5rem 0;
+  max-width: 540px;
+  animation: ${fadeInUp} 0.8s ease-out 0.4s both;
 `;
 
-export const TrustList = styled.ul`
-  margin: 1rem 0 0;
-  padding: 0;
-  list-style: none;
-  display: grid;
-  gap: 0.6rem;
-`;
-
-export const TrustItem = styled.li`
+export const HeroStats = styled.div`
   display: flex;
-  align-items: flex-start;
-  gap: 0.6rem;
-  color: var(--tf-text-secondary);
+  gap: 2rem;
+  margin-bottom: 2.5rem;
+  animation: ${fadeInUp} 0.8s ease-out 0.6s both;
+
+  @media (max-width: 640px) {
+    flex-direction: column;
+    gap: 1rem;
+  }
 `;
 
-export const Dot = styled.span`
-  width: 8px;
-  height: 8px;
-  border-radius: 999px;
-  background: #11b491;
-  margin-top: 0.45rem;
-  flex-shrink: 0;
+export const HeroStat = styled.div`
+  display: flex;
+  flex-direction: column;
 `;
 
-export const TrustLabel = styled.strong`
-  color: var(--tf-text-primary);
+export const HeroStatValue = styled.div`
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--tf-primary);
+  line-height: 1;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-feature-settings: 'liga' 1, 'calt' 1;
+`;
+
+export const HeroStatLabel = styled.div`
+  font-size: 0.875rem;
+  color: var(--tf-text-muted);
+  margin-top: 0.25rem;
 `;
 
 export const CTAGroup = styled.div`
-  margin-top: 1.25rem;
   display: flex;
-  gap: 0.7rem;
+  gap: 1rem;
   flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+  animation: ${fadeInUp} 0.8s ease-out 0.8s both;
 `;
 
 export const ButtonPrimary = styled.button`
-  min-height: 44px;
-  border-radius: 11px;
-  border: 1px solid transparent;
-  background: var(--tf-trust);
-  color: #f3f8ff;
-  padding: 0.66rem 1rem;
-  font-size: 0.92rem;
-  font-weight: 700;
+  padding: 0.875rem 2rem;
+  background: var(--tf-accent);
+  color: var(--tf-text-primary);
+  border: 1px solid var(--tf-accent);
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
   cursor: pointer;
-  transition: transform 180ms ease, box-shadow 180ms ease, background 180ms ease;
+  transition: all 0.3s ease;
+  box-shadow: var(--tf-shadow-md);
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    transition: left 0.5s;
+  }
 
   &:hover {
-    background: #0f2240;
-    transform: translateY(-1px);
-    box-shadow: 0 10px 20px rgba(15, 34, 64, 0.25);
+    transform: translateY(-2px);
+    box-shadow: var(--tf-shadow-lg);
+    background: var(--tf-accent-hover);
+    border-color: var(--tf-accent-hover);
+
+    &::before {
+      left: 100%;
+    }
+  }
+
+  &:active {
+    transform: translateY(0);
   }
 
   &:focus-visible {
-    outline: 2px solid #11b491;
+    outline: 2px solid var(--tf-focus-ring);
     outline-offset: 2px;
+  }
+
+  &:disabled {
+    background: var(--tf-disabled);
+    color: var(--tf-text-muted);
+    cursor: not-allowed;
+    opacity: 0.5;
   }
 `;
 
 export const ButtonSecondary = styled(ButtonPrimary)`
   background: transparent;
-  color: var(--tf-accent);
-  border-color: rgba(11, 107, 99, 0.35);
+  color: var(--tf-text-primary);
+  border: 1px solid var(--tf-border-medium);
   box-shadow: none;
 
   &:hover {
-    background: rgba(11, 107, 99, 0.08);
-    transform: translateY(-1px);
-    box-shadow: none;
+    background: rgba(102, 102, 102, 0.1);
+    border-color: var(--tf-accent);
+    box-shadow: var(--tf-shadow-sm);
   }
 `;
 
 export const SignInRow = styled.p`
-  margin: 1rem 0 0;
   color: var(--tf-text-muted);
+  font-size: 0.9375rem;
+  margin: 0;
+  animation: ${fadeIn} 0.8s ease-out 1s both;
 `;
 
 export const SignInLink = styled.button`
@@ -168,328 +490,352 @@ export const SignInLink = styled.button`
   text-decoration: underline;
   font-weight: 600;
   cursor: pointer;
+  transition: color 0.2s ease;
+
+  &:hover {
+    color: var(--tf-accent-hover);
+  }
 
   &:focus-visible {
-    outline: 2px solid #11b491;
+    outline: 2px solid var(--tf-focus-ring);
     outline-offset: 2px;
     border-radius: 4px;
   }
 `;
 
-export const VisualLabel = styled.p`
-  margin: 0;
-  font-size: 0.8rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: rgba(236, 247, 255, 0.78);
-  font-weight: 700;
+export const HeroVisual = styled.div`
+  position: relative;
+  height: 500px;
+  border-radius: 24px;
+  overflow: hidden;
+  animation: ${fadeIn} 1s ease-out 0.4s both;
+
+  @media (max-width: 968px) {
+    height: 400px;
+  }
+`;
+
+export const VisualGradient = styled.div`
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, var(--tf-bg-surface) 0%, rgba(102, 102, 102, 0.1) 100%);
+  background-size: 200% 200%;
+  animation: ${gradientShift} 8s ease infinite;
+`;
+
+export const VisualContent = styled.div`
+  position: relative;
+  z-index: 1;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 3rem;
+  text-align: center;
+  color: var(--tf-text-primary);
 `;
 
 export const VisualTitle = styled.h2`
-  margin: 0.4rem 0 0;
-  color: #f8fcff;
-  font-size: clamp(1.25rem, 2.4vw, 1.75rem);
-  line-height: 1.2;
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0 0 1rem 0;
+  animation: ${float} 3s ease-in-out infinite;
 `;
 
-export const VisualGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.6rem;
-`;
-
-export const VisualStat = styled.article`
-  border: 1px solid rgba(236, 247, 255, 0.2);
-  border-radius: 11px;
-  padding: 0.75rem;
-  background: rgba(236, 247, 255, 0.08);
-`;
-
-export const VisualValue = styled.p`
+export const VisualSubtitle = styled.p`
+  font-size: 1.125rem;
+  opacity: 0.9;
   margin: 0;
-  font-size: 1.5rem;
-  font-weight: 800;
-  letter-spacing: -0.02em;
 `;
 
-export const VisualMeta = styled.p`
-  margin: 0.25rem 0 0;
-  color: rgba(236, 247, 255, 0.85);
-  font-size: 0.82rem;
-  line-height: 1.4;
-`;
-
-export const MetricsStrip = styled(Surface)`
+// Metrics Section
+export const MetricsSection = styled.section`
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 0.7rem;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+  margin-bottom: 6rem;
+
+  @media (max-width: 968px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (max-width: 640px) {
+    grid-template-columns: 1fr;
+  }
 `;
 
-export const MetricCard = styled.article`
-  border-radius: 11px;
-  padding: 0.75rem;
+type MetricCardProps = {
+  $isVisible: boolean;
+  $delay?: number;
+};
+
+export const MetricCard = styled.article<MetricCardProps>`
+  background: var(--tf-bg-surface);
   border: 1px solid var(--tf-border-subtle);
-  background: var(--tf-bg-soft);
+  border-radius: 16px;
+  padding: 2rem 1.5rem;
+  text-align: center;
+  transition: all 0.3s ease;
+  box-shadow: var(--tf-shadow-sm);
+  opacity: ${props => (props.$isVisible ? 1 : 0)};
+  transform: ${props => (props.$isVisible ? 'translateY(0) scale(1)' : 'translateY(20px) scale(0.95)')};
+  transition: opacity 0.6s ease, transform 0.6s ease;
+  transition-delay: ${props => `${props.$delay || 0}s`};
+
+  &:hover {
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: var(--tf-shadow-md);
+    border-color: var(--tf-accent);
+    background: var(--tf-bg-surface);
+  }
 `;
 
-export const MetricValue = styled.p`
-  margin: 0;
-  color: var(--tf-trust);
+export const MetricValue = styled.div`
+  font-size: clamp(2rem, 4vw, 3rem);
   font-weight: 800;
-  font-size: clamp(1.45rem, 2.7vw, 2.1rem);
-  letter-spacing: -0.02em;
+  color: var(--tf-text-primary);
+  line-height: 1;
+  margin-bottom: 0.5rem;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-feature-settings: 'liga' 1, 'calt' 1;
 `;
 
 export const MetricLabel = styled.p`
-  margin: 0.28rem 0 0;
+  font-size: 0.9375rem;
   color: var(--tf-text-muted);
-  font-size: 0.88rem;
+  margin: 0;
+  line-height: 1.5;
+`;
+
+// Section Styles
+export const Section = styled.section`
+  margin-bottom: 6rem;
+`;
+
+export const SectionHeader = styled.div`
+  text-align: center;
+  margin-bottom: 3rem;
 `;
 
 export const SectionTitle = styled.h2`
-  margin: 0;
-  color: var(--tf-trust);
-  font-size: clamp(1.25rem, 2.5vw, 1.72rem);
-  letter-spacing: -0.01em;
-`;
-
-export const SectionBody = styled.p`
-  margin: 0.62rem 0 0;
-  color: var(--tf-text-secondary);
-  line-height: 1.62;
-`;
-
-export const ProblemGrid = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
-`;
-
-export const PainList = styled.ul`
-  margin: 1rem 0 0;
-  padding: 0;
-  list-style: none;
-  display: grid;
-  gap: 0.56rem;
-`;
-
-export const PainItem = styled.li`
-  display: flex;
-  align-items: flex-start;
-  gap: 0.55rem;
-  color: var(--tf-text-secondary);
-`;
-
-export const BeforeCard = styled.article`
-  border: 1px solid var(--tf-border-subtle);
-  border-radius: 12px;
-  background: linear-gradient(170deg, #f7fbff, #f5fbf8);
-  padding: 1rem;
-`;
-
-export const BeforeLabel = styled.p`
-  margin: 0;
-  color: var(--tf-trust);
+  font-size: clamp(2rem, 4vw, 2.75rem);
   font-weight: 800;
-`;
-
-export const BeforeStack = styled.div`
-  margin-top: 0.75rem;
-  display: grid;
-  gap: 0.6rem;
-`;
-
-export const BeforeItem = styled.div`
-  border: 1px solid var(--tf-border-subtle);
-  border-radius: 10px;
-  background: #ffffff;
-  padding: 0.7rem;
-`;
-
-export const BeforeItemTitle = styled.p`
-  margin: 0;
   color: var(--tf-text-primary);
-  font-weight: 700;
+  margin: 0 0 1rem 0;
+  letter-spacing: -0.02em;
 `;
 
-export const BeforeItemText = styled.p`
-  margin: 0.26rem 0 0;
-  color: var(--tf-text-muted);
-  font-size: 0.88rem;
+export const SectionSubtitle = styled.p`
+  font-size: 1.125rem;
+  color: var(--tf-text-secondary);
+  margin: 0;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
 `;
 
+// Steps Grid
 export const StepsGrid = styled.div`
-  margin-top: 0.9rem;
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 0.7rem;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+
+  @media (max-width: 968px) {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
 `;
 
 export const StepCard = styled.article`
+  background: var(--tf-bg-surface);
   border: 1px solid var(--tf-border-subtle);
-  border-radius: 11px;
-  background: var(--tf-bg-soft);
-  padding: 0.88rem;
+  border-radius: 20px;
+  padding: 2.5rem 2rem;
+  transition: all 0.3s ease;
+  box-shadow: var(--tf-shadow-sm);
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--tf-accent);
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+  }
+
+  &:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--tf-shadow-lg);
+    border-color: var(--tf-accent);
+    background: var(--tf-bg-surface);
+
+    &::before {
+      transform: scaleX(1);
+    }
+  }
 `;
 
-export const StepLabel = styled.p`
-  margin: 0;
+export const StepNumber = styled.div`
+  font-size: 3rem;
+  font-weight: 800;
   color: var(--tf-accent);
-  font-size: 0.78rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.09em;
+  opacity: 0.2;
+  line-height: 1;
+  margin-bottom: 1rem;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-feature-settings: 'liga' 1, 'calt' 1;
 `;
 
 export const StepTitle = styled.h3`
-  margin: 0.5rem 0 0;
+  font-size: 1.5rem;
+  font-weight: 700;
   color: var(--tf-text-primary);
-  font-size: 1rem;
+  margin: 0 0 1rem 0;
 `;
 
 export const StepBody = styled.p`
-  margin: 0.42rem 0 0;
-  color: var(--tf-text-muted);
-  line-height: 1.55;
+  font-size: 1rem;
+  line-height: 1.7;
+  color: var(--tf-text-secondary);
+  margin: 0;
 `;
 
+// Features Grid
 export const FeaturesGrid = styled.div`
-  margin-top: 0.9rem;
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.75rem;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
 `;
 
-export const FeatureCard = styled.article`
+type FeatureCardProps = {
+  $isVisible: boolean;
+  $delay?: number;
+};
+
+export const FeatureCard = styled.article<FeatureCardProps>`
+  background: var(--tf-bg-surface);
   border: 1px solid var(--tf-border-subtle);
-  border-radius: 12px;
-  background: var(--tf-bg-soft);
-  padding: 0.9rem;
-  transition: transform 200ms ease, box-shadow 200ms ease;
+  border-radius: 16px;
+  padding: 2rem;
+  transition: all 0.3s ease;
+  box-shadow: var(--tf-shadow-sm);
+  opacity: ${props => (props.$isVisible ? 1 : 0)};
+  transform: ${props => (props.$isVisible ? 'translateY(0)' : 'translateY(20px)')};
+  transition: opacity 0.6s ease, transform 0.6s ease;
+  transition-delay: ${props => `${props.$delay || 0}s`};
 
   &:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--tf-shadow-hover);
+    transform: translateY(-4px);
+    box-shadow: var(--tf-shadow-md);
+    border-color: var(--tf-accent);
+    background: var(--tf-bg-surface);
   }
+`;
+
+export const FeatureIcon = styled.div`
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  display: inline-block;
+  animation: ${float} 3s ease-in-out infinite;
 `;
 
 export const FeatureTitle = styled.h3`
-  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
   color: var(--tf-text-primary);
-  font-size: 1rem;
+  margin: 0 0 0.75rem 0;
 `;
 
 export const FeatureBody = styled.p`
-  margin: 0.45rem 0 0;
-  color: var(--tf-text-muted);
-  line-height: 1.55;
-  font-size: 0.9rem;
-`;
-
-export const PersonaGrid = styled(Surface)`
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.8rem;
-`;
-
-const PersonaCardBase = styled.article`
-  border: 1px solid var(--tf-border-subtle);
-  border-radius: 12px;
-  padding: 0.95rem;
-`;
-
-export const RecruiterCard = styled(PersonaCardBase)`
-  background: #f8fafc;
-`;
-
-export const CandidateCard = styled(PersonaCardBase)`
-  background: #f0fdf8;
-`;
-
-export const PersonaLabel = styled.p`
-  margin: 0;
-  color: var(--tf-accent);
-  font-size: 0.8rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-`;
-
-export const PersonaTitle = styled.h3`
-  margin: 0.45rem 0 0;
-  color: var(--tf-text-primary);
-  font-size: 1.05rem;
-`;
-
-export const PersonaBody = styled.p`
-  margin: 0.45rem 0 0;
+  font-size: 1rem;
+  line-height: 1.7;
   color: var(--tf-text-secondary);
-  line-height: 1.58;
-`;
-
-export const FinalCTA = styled(Surface)`
-  text-align: center;
-`;
-
-export const FinalTitle = styled.h2`
   margin: 0;
-  color: var(--tf-trust);
-  font-size: clamp(1.4rem, 2.8vw, 2rem);
 `;
 
-export const FinalBody = styled.p`
-  margin: 0.56rem auto 0;
-  max-width: 66ch;
-  color: var(--tf-text-muted);
-  line-height: 1.6;
-`;
-
-export const VisuallyHidden = styled.h2`
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
+// CTA Section
+export const CTASection = styled.section`
+  background: var(--tf-bg-surface);
+  border: 1px solid var(--tf-border-subtle);
+  border-radius: 24px;
+  padding: 4rem 3rem;
+  text-align: center;
+  color: var(--tf-text-primary);
+  margin-bottom: 4rem;
+  position: relative;
   overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  border: 0;
-`;
 
-export const SpacerButton = styled(ButtonPrimary)`
-  margin-top: 1.1rem;
-`;
-
-export const ResponsiveStyles = styled.div`
-  @media (max-width: 1024px) {
-    ${HeroLayout} {
-      grid-template-columns: 1fr;
-    }
-
-    ${MetricsStrip} {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
-    ${ProblemGrid},
-    ${StepsGrid},
-    ${FeaturesGrid},
-    ${PersonaGrid},
-    ${VisualGrid} {
-      grid-template-columns: 1fr;
-    }
+  &::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(102, 102, 102, 0.05) 0%, transparent 70%);
+    animation: ${float} 6s ease-in-out infinite;
   }
 
-  @media (max-width: 600px) {
-    ${Container} {
-      padding: 1rem;
-    }
+  @media (max-width: 768px) {
+    padding: 3rem 2rem;
+  }
+`;
 
-    ${HeroPanel},
-    ${Surface} {
-      padding: 1.15rem;
-    }
+export const CTATitle = styled.h2`
+  font-size: clamp(2rem, 4vw, 2.75rem);
+  font-weight: 800;
+  margin: 0 0 1rem 0;
+  position: relative;
+  z-index: 1;
+`;
 
-    ${MetricsStrip} {
-      grid-template-columns: 1fr;
-    }
+export const CTADescription = styled.p`
+  font-size: 1.125rem;
+  opacity: 0.95;
+  margin: 0 0 2rem 0;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+  position: relative;
+  z-index: 1;
+`;
+
+export const CTAButton = styled.button`
+  padding: 1rem 2.5rem;
+  background: var(--tf-accent);
+  color: var(--tf-text-primary);
+  border: none;
+  border-radius: 12px;
+  font-size: 1.125rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  position: relative;
+  z-index: 1;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.6);
+    background: var(--tf-accent-hover);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  &:focus-visible {
+    outline: 3px solid var(--tf-focus-ring);
+    outline-offset: 2px;
   }
 `;

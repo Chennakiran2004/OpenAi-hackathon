@@ -88,7 +88,7 @@ function RecruiterHome({
             </div>
             <p>{status === 'idle' ? 'Waiting to start.' : `Processed ${processed}/${bulkSize} resumes (${progress}%)`}</p>
             <p>
-              ETA: {etaSeconds === '--' ? '--' : `${etaSeconds}s`} | Throughput: {throughput} resumes/min
+              <span className={styles.eta}>ETA: {etaSeconds === '--' ? '--' : `${etaSeconds}s`}</span> | <span className={styles.throughput}>Throughput: {throughput} resumes/min</span>
             </p>
           </div>
           <button className={styles.primaryButton} type="button" onClick={onStartProcessing}>
@@ -125,15 +125,15 @@ function RecruiterHome({
               )}
               {ranked.map((candidate, index) => (
                 <tr key={candidate.id}>
-                  <td>#{index + 1}</td>
+                  <td className={styles.rank}>#{index + 1}</td>
                   <td>
                     <p>{blindMode ? `Candidate ${candidate.id}` : candidate.name}</p>
                     <small className={styles.smallText}>{blindMode ? 'Hidden profile' : `${candidate.college}, ${candidate.location}`}</small>
                   </td>
                   <td>{candidate.role}</td>
-                  <td>{candidate.finalScore.toFixed(1)}%</td>
+                  <td className={styles.score}>{candidate.finalScore.toFixed(1)}%</td>
                   <td>
-                    <small className={styles.smallText}>
+                    <small className={`${styles.smallText} ${styles.technicalMetric}`}>
                       Skill {candidate.skillMatch.toFixed(0)} | Projects {candidate.projectSimilarity.toFixed(0)} | Exp {candidate.experienceFit.toFixed(0)}
                     </small>
                   </td>

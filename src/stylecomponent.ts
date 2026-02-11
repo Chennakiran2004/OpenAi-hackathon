@@ -3,17 +3,17 @@ const APP_STYLE_ID = 'tf-app-styles';
 const appCss = `
 .app-shell {
   min-height: 100vh;
-  background: #f8fafc;
-  color: #0f172a;
+  background: #111111;
+  color: #E0E0E0;
 }
 
 .app-container {
-  width: min(1200px, calc(100% - 2rem));
-  margin: 0 auto;
+  width: 100%;
+  margin: 0;
 }
 
 .app-main {
-  padding: 2rem 0 3rem;
+  padding: 0;
 }
 `;
 
