@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   clearAccessToken,
   getAccessToken,
@@ -8,79 +8,85 @@ import {
   setAccessToken,
   setStoredRole,
   signin as apiSignin,
-  signup as apiSignup
-} from './api/clientapi';
-import type { SignupPayload } from './api/types';
-import AuthPage from './components/AuthPage';
-import LandingPage from './components/LandingPage';
-import ProfilePage from './components/ProfilePage';
-import RecruiterHome from './components/RecruiterHome';
-import StudentHome from './components/StudentHome';
-import HomeNavbar from './components/HomeNavbar';
-import TopBar from './components/TopBar';
-import { createCandidate } from './components/candidateUtils';
-import { AuthMode, Candidate, ProcessingStatus, Role, User, View } from './components/types';
-import { appStyles as styles } from './stylecomponent';
+  signup as apiSignup,
+} from "./api/clientapi";
+import type { SignupPayload } from "./api/types";
+import AuthPage from "./components/AuthPage";
+import LandingPage from "./components/LandingPage";
+import ProfilePage from "./components/ProfilePage";
+import RecruiterHome from "./components/RecruiterHome";
+import StudentHome from "./components/StudentHome";
+import HomeNavbar from "./components/HomeNavbar";
+import TopBar from "./components/TopBar";
+import {
+  createRecommendations,
+  aggregateImpacts,
+} from "./components/recommendationUtils";
+import {
+  AuthMode,
+  ProcessingStatus,
+  Recommendation,
+  Role,
+  User,
+  View,
+  WeightConfig,
+  ImpactSummary,
+} from "./components/types";
+import { appStyles as styles } from "./stylecomponent";
 
-function profileToUser(profile: { username: string; email: string }, role: Role): User {
+function profileToUser(
+  profile: { username: string; email: string },
+  role: Role,
+): User {
   return { name: profile.username, email: profile.email, role };
 }
 
 function App() {
-  const [view, setView] = useState<View>('landing');
-  const [authMode, setAuthMode] = useState<AuthMode>('signin');
-  const [roleChoice, setRoleChoice] = useState<Role>('student');
+  const [view, setView] = useState<View>("landing");
+  const [authMode, setAuthMode] = useState<AuthMode>("signin");
+  const [roleChoice, setRoleChoice] = useState<Role>("state_officer");
   const [user, setUser] = useState<User | null>(null);
 
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [phoneNumber, setPhoneNumber] = useState('');
-  const [age, setAge] = useState('');
-  const [gender, setGender] = useState('');
-  const [address, setAddress] = useState('');
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [stateField, setStateField] = useState("");
+  const [department, setDepartment] = useState("");
+  const [note, setNote] = useState("");
   const [authError, setAuthError] = useState<string | null>(null);
 
-  const [bulkSize, setBulkSize] = useState(500);
+  const [quantity, setQuantity] = useState(10);
+  const [crop, setCrop] = useState("tomato");
+  const [urgency, setUrgency] = useState("Standard");
+  const [deliveryWindow, setDeliveryWindow] = useState("3-5 days");
+  const [priceCap, setPriceCap] = useState("");
+  const [climateMode, setClimateMode] = useState(false);
+
+  const [weights, setWeights] = useState<WeightConfig>({
+    cost: 50,
+    time: 25,
+    carbon: 25,
+  });
+  const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
+  const [impacts, setImpacts] = useState<ImpactSummary | null>(null);
+  const [status, setStatus] = useState<ProcessingStatus>("idle");
   const [processed, setProcessed] = useState(0);
-  const [status, setStatus] = useState<ProcessingStatus>('idle');
-  const [blindMode, setBlindMode] = useState(false);
-  const [ranked, setRanked] = useState<Candidate[]>([]);
-  const [startTime, setStartTime] = useState<number | null>(null);
-  const [endTime, setEndTime] = useState<number | null>(null);
-
-  const progress = bulkSize > 0 ? Math.min(100, Math.round((processed / bulkSize) * 100)) : 0;
-
-  const elapsedMs = useMemo(() => {
-    if (!startTime) {
-      return 0;
-    }
-    if (endTime) {
-      return endTime - startTime;
-    }
-    return Date.now() - startTime;
-  }, [startTime, endTime]);
-
-  const throughput = elapsedMs > 0 ? ((processed * 60000) / elapsedMs).toFixed(1) : '0.0';
-
-  const etaSeconds = useMemo(() => {
-    if (status !== 'running' || processed === 0) {
-      return '--';
-    }
-    const ratePerMs = processed / elapsedMs;
-    const left = Math.max(bulkSize - processed, 0);
-    return Math.ceil(left / ratePerMs / 1000).toString();
-  }, [status, processed, elapsedMs, bulkSize]);
+  const progress = useMemo(
+    () =>
+      status === "running" || status === "done" ? Math.min(100, processed) : 0,
+    [status, processed],
+  );
 
   useEffect(() => {
     const token = getAccessToken();
     if (!token) return;
     getProfile()
       .then((profile) => {
-        const role = getStoredRole() || 'student';
+        const role = getStoredRole() || "state_officer";
         setUser(profileToUser(profile, role));
-        setView('home');
+        setView("home");
       })
       .catch(() => {
         clearAccessToken();
@@ -91,7 +97,7 @@ function App() {
     if (role) setRoleChoice(role);
     setAuthMode(mode);
     setAuthError(null);
-    setView('auth');
+    setView("auth");
   }, []);
 
   const submitAuth = useCallback(
@@ -101,34 +107,34 @@ function App() {
       const trimmedEmail = email.trim();
       const trimmedPassword = password.trim();
 
-      if (authMode === 'signin') {
+      if (authMode === "signin") {
         try {
           const { access } = await apiSignin(trimmedEmail, trimmedPassword);
           setAccessToken(access);
           setStoredRole(roleChoice);
           const profile = await getProfile();
           setUser(profileToUser(profile, roleChoice));
-          setView('home');
+          setView("home");
         } catch (err) {
           setAuthError(getErrorMessage(err));
         }
         return;
       }
 
-      if (authMode === 'signup') {
+      if (authMode === "signup") {
         if (trimmedPassword !== confirmPassword.trim()) {
-          setAuthError('Passwords do not match.');
+          setAuthError("Passwords do not match.");
           return;
         }
         const payload: SignupPayload = {
           email: trimmedEmail,
           password: trimmedPassword,
           confirm_password: confirmPassword.trim(),
-          username: name.trim() || trimmedEmail.split('@')[0] || 'user',
+          username: name.trim() || trimmedEmail.split("@")[0] || "user",
           phone_number: phoneNumber.trim(),
-          age: Number(age) || 0,
-          gender: gender.trim() || 'Prefer not to say',
-          address: address.trim()
+          state: stateField.trim(),
+          department: department.trim(),
+          note: note.trim(),
         };
         try {
           const { access } = await apiSignup(payload);
@@ -136,91 +142,85 @@ function App() {
           setStoredRole(roleChoice);
           const profile = await getProfile();
           setUser(profileToUser(profile, roleChoice));
-          setView('home');
+          setView("home");
         } catch (err) {
           setAuthError(getErrorMessage(err));
         }
       }
     },
-    [authMode, email, password, confirmPassword, name, phoneNumber, age, gender, address, roleChoice]
+    [
+      authMode,
+      email,
+      password,
+      confirmPassword,
+      name,
+      phoneNumber,
+      stateField,
+      department,
+      note,
+      roleChoice,
+    ],
   );
 
   const logout = useCallback(() => {
     clearAccessToken();
     setUser(null);
-    setName('');
-    setEmail('');
-    setPassword('');
-    setConfirmPassword('');
-    setPhoneNumber('');
-    setAge('');
-    setGender('');
-    setAddress('');
-    setView('landing');
+    setName("");
+    setEmail("");
+    setPassword("");
+    setConfirmPassword("");
+    setPhoneNumber("");
+    setStateField("");
+    setDepartment("");
+    setNote("");
+    setView("landing");
   }, []);
 
-  const runRecruiterDemo = () => {
-    const total = Math.max(100, Math.min(10000, bulkSize));
-    setBulkSize(total);
-    setStatus('running');
+  const runOptimizationDemo = () => {
+    setStatus("running");
     setProcessed(0);
-    setRanked([]);
-    setStartTime(Date.now());
-    setEndTime(null);
-
-    const targetDuration = Math.max(9000, Math.min(25000, total * 18));
-    const tickMs = 180;
-    const step = total / (targetDuration / tickMs);
-
-    let localProcessed = 0;
-    const timer = window.setInterval(() => {
-      localProcessed = Math.min(total, localProcessed + step + Math.random() * step * 0.2);
-      const rounded = Math.floor(localProcessed);
-      setProcessed(rounded);
-
-      if (rounded >= total) {
-        window.clearInterval(timer);
-        const candidates = Array.from({ length: total }, (_, i) => createCandidate(i + 1))
-          .sort((a, b) => b.finalScore - a.finalScore)
-          .slice(0, 10);
-        setRanked(candidates);
-        setStatus('done');
-        setProcessed(total);
-        setEndTime(Date.now());
-      }
-    }, tickMs);
+    setTimeout(() => {
+      setProcessed(60);
+    }, 250);
+    setTimeout(() => {
+      const recs = createRecommendations({ crop, quantity, weights });
+      setRecommendations(recs);
+      setImpacts(aggregateImpacts(recs));
+      setProcessed(100);
+      setStatus("done");
+    }, 800);
   };
 
-  const showHomeNav = view === 'home' || view === 'profile';
+  const showHomeNav = view === "home" || view === "profile";
 
   return (
     <>
       {showHomeNav ? (
         <HomeNavbar
-          onBrandClick={() => setView('home')}
-          onProfileClick={() => setView('profile')}
+          onBrandClick={() => setView("home")}
+          onProfileClick={() => setView("profile")}
           onLogout={logout}
         />
       ) : (
         <TopBar
           isLoggedIn={Boolean(user)}
-          onBrandClick={() => setView(user ? 'home' : 'landing')}
-          onSignIn={() => openAuth('signin')}
-          onSignUp={() => openAuth('signup')}
+          onBrandClick={() => setView(user ? "home" : "landing")}
+          onSignIn={() => openAuth("signin")}
+          onSignUp={() => openAuth("signup")}
           onLogout={logout}
         />
       )}
 
       <main className={`${styles.container} ${styles.main}`}>
-        {view === 'landing' && (
+        {view === "landing" && (
           <LandingPage
-            onRecruiterSignUp={() => openAuth('signup', 'recruiter')}
-            onStudentSignUp={() => openAuth('signup', 'student')}
-            onSignIn={() => openAuth('signin')}
+            onRequestDemo={() => openAuth("signup", "state_officer")}
+            onViewSandbox={() => openAuth("signup", "central_admin")}
+            onSignIn={() => openAuth("signin")}
           />
         )}
 
-        {view === 'auth' && (
+        {view === "auth" && (
           <AuthPage
             authMode={authMode}
             roleChoice={roleChoice}
@@ -229,9 +229,9 @@ function App() {
             password={password}
             confirmPassword={confirmPassword}
             phoneNumber={phoneNumber}
-            age={age}
-            gender={gender}
-            address={address}
+            state={stateField}
+            department={department}
+            note={note}
             authError={authError}
             onSetRoleChoice={setRoleChoice}
             onSetName={setName}
@@ -239,43 +239,59 @@ function App() {
             onSetPassword={setPassword}
             onSetConfirmPassword={setConfirmPassword}
             onSetPhoneNumber={setPhoneNumber}
-            onSetAge={setAge}
-            onSetGender={setGender}
-            onSetAddress={setAddress}
+            onSetState={setStateField}
+            onSetDepartment={setDepartment}
+            onSetNote={setNote}
             onSwitchMode={() => {
-              setAuthMode(authMode === 'signin' ? 'signup' : 'signin');
+              setAuthMode(authMode === "signin" ? "signup" : "signin");
               setAuthError(null);
             }}
             onSubmit={submitAuth}
           />
         )}
 
-        {view === 'home' && user?.role === 'student' && <StudentHome name={user.name} />}
-
-        {view === 'home' && user?.role === 'recruiter' && (
-          <RecruiterHome
+        {view === "home" && user?.role === "central_admin" && (
+          <StudentHome
             name={user.name}
-            bulkSize={bulkSize}
-            processed={processed}
-            progress={progress}
-            status={status}
-            blindMode={blindMode}
-            etaSeconds={etaSeconds}
-            throughput={throughput}
-            ranked={ranked}
-            onBulkSizeChange={setBulkSize}
-            onBlindModeChange={setBlindMode}
-            onStartProcessing={runRecruiterDemo}
+            impacts={impacts}
+            recommendations={recommendations}
           />
         )}
 
-        {view === 'profile' && user && (
+        {view === "home" && user?.role === "state_officer" && (
+          <RecruiterHome
+            name={user.name}
+            crop={crop}
+            quantity={quantity}
+            urgency={urgency}
+            deliveryWindow={deliveryWindow}
+            priceCap={priceCap}
+            climateMode={climateMode}
+            weights={weights}
+            recommendations={recommendations}
+            impacts={impacts}
+            status={status}
+            progress={progress}
+            onSetCrop={setCrop}
+            onSetQuantity={setQuantity}
+            onSetUrgency={setUrgency}
+            onSetDeliveryWindow={setDeliveryWindow}
+            onSetPriceCap={setPriceCap}
+            onToggleClimateMode={setClimateMode}
+            onSetWeights={setWeights}
+            onRunOptimization={runOptimizationDemo}
+          />
+        )}
+
+        {view === "profile" && user && (
           <ProfilePage
             user={user}
             onUpdateProfile={({ name: newName, email: newEmail }) =>
-              setUser((u) => (u ? { ...u, name: newName, email: newEmail } : null))
+              setUser((u) =>
+                u ? { ...u, name: newName, email: newEmail } : null,
+              )
             }
-            onBackToHome={() => setView('home')}
+            onBackToHome={() => setView("home")}
           />
         )}
       </main>

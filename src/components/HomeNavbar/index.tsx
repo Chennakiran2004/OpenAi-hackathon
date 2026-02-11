@@ -11,7 +11,7 @@ function HomeNavbar({ onBrandClick, onLogout, onProfileClick }: HomeNavbarProps)
   return (
     <header className={styles.bar}>
       <button type="button" className={styles.brandButton} onClick={onBrandClick}>
-        TALENTFORGE AI
+        BHARAT KRISHI SETU
       </button>
       <div className={styles.right}>
         {onProfileClick && (

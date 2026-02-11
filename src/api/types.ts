@@ -5,9 +5,9 @@ export type SignupPayload = {
   confirm_password: string;
   username: string;
   phone_number: string;
-  age: number;
-  gender: string;
-  address: string;
+  state?: string;
+  department?: string;
+  note?: string;
 };
 
 /** Signup success response (201) */
@@ -36,9 +36,9 @@ export type ProfileUser = {
   email: string;
   username: string;
   phone_number: string;
-  age: number;
-  gender: string;
-  address: string;
+  state?: string;
+  department?: string;
+  note?: string;
   profile_picture: string | null;
   created_at: string;
   updated_at: string;

@@ -1,148 +1,241 @@
 import React from 'react';
-import { Candidate, ProcessingStatus } from '../types';
+import { ImpactSummary, ProcessingStatus, Recommendation, WeightConfig } from '../types';
 import { recruiterHomeStyles as styles } from './stylecomponent';
 
 type RecruiterHomeProps = {
   name: string;
-  bulkSize: number;
-  processed: number;
-  progress: number;
+  crop: string;
+  quantity: number;
+  urgency: string;
+  deliveryWindow: string;
+  priceCap: string;
+  climateMode: boolean;
+  weights: WeightConfig;
+  recommendations: Recommendation[];
+  impacts: ImpactSummary | null;
   status: ProcessingStatus;
-  blindMode: boolean;
-  etaSeconds: string;
-  throughput: string;
-  ranked: Candidate[];
-  onBulkSizeChange: (value: number) => void;
-  onBlindModeChange: (value: boolean) => void;
-  onStartProcessing: () => void;
+  progress: number;
+  onSetCrop: (value: string) => void;
+  onSetQuantity: (value: number) => void;
+  onSetUrgency: (value: string) => void;
+  onSetDeliveryWindow: (value: string) => void;
+  onSetPriceCap: (value: string) => void;
+  onToggleClimateMode: (value: boolean) => void;
+  onSetWeights: (value: WeightConfig) => void;
+  onRunOptimization: () => void;
 };
 
 function RecruiterHome({
   name,
-  bulkSize,
-  processed,
-  progress,
+  crop,
+  quantity,
+  urgency,
+  deliveryWindow,
+  priceCap,
+  climateMode,
+  weights,
+  recommendations,
+  impacts,
   status,
-  blindMode,
-  etaSeconds,
-  throughput,
-  ranked,
-  onBulkSizeChange,
-  onBlindModeChange,
-  onStartProcessing
+  progress,
+  onSetCrop,
+  onSetQuantity,
+  onSetUrgency,
+  onSetDeliveryWindow,
+  onSetPriceCap,
+  onToggleClimateMode,
+  onSetWeights,
+  onRunOptimization
 }: RecruiterHomeProps) {
+  const onWeightChange = (key: keyof WeightConfig) => (value: number) => {
+    onSetWeights({ ...weights, [key]: value });
+  };
+
   return (
     <section className={styles.section}>
       <div className={styles.inner}>
         <div className={styles.header}>
-          <h2>Recruiter Home</h2>
-          <p>Welcome {name}. Create jobs, upload resume batches, and shortlist candidates with explainable fair ranking.</p>
+          <h2>State Procurement Workspace</h2>
+          <p>Welcome {name}. Plan and optimize inter-state crop sourcing with live cost, time, and carbon insights.</p>
         </div>
 
         <div className={styles.twoCol}>
-        <article className={styles.panel}>
-          <h3>Create Job Post</h3>
-          <div className={styles.formGrid}>
-            <label className={styles.label}>
-              Job title
-              <input className={styles.input} placeholder="Senior ML Engineer" />
-            </label>
-            <label className={styles.label}>
-              Key skills
-              <input className={styles.input} placeholder="Python, NLP, MLOps, SQL" />
-            </label>
-            <label className={styles.label}>
-              Experience range
-              <input className={styles.input} placeholder="2-5 years" />
-            </label>
-            <label className={styles.label}>
-              Location
-              <input className={styles.input} placeholder="Bengaluru" />
-            </label>
-          </div>
-          <button className={styles.primaryButton} type="button">
-            Save Job Description
-          </button>
-        </article>
-
-        <article className={styles.demoPanel}>
-          <h3>Bulk Resume Processing</h3>
-          <label className={styles.label} htmlFor="bulkSize">
-            Resume batch size
-          </label>
-          <input
-            className={styles.input}
-            id="bulkSize"
-            type="number"
-            min={100}
-            max={10000}
-            value={bulkSize}
-            onChange={(e) => onBulkSizeChange(Number(e.target.value) || 100)}
-          />
-          <label className={styles.label} htmlFor="resumeUpload">
-            Upload CSV/ZIP
-          </label>
-          <input className={styles.input} id="resumeUpload" type="file" accept=".csv,.zip" />
-          <div className={styles.progressWrap} aria-live="polite">
-            <div className={styles.progressTrack}>
-              <div className={styles.progressFill} style={{ width: `${progress}%` }} />
+          <article className={styles.panel}>
+            <h3>Demand & Constraints</h3>
+            <div className={styles.formGrid}>
+              <label className={styles.label}>
+                Crop
+                <select className={styles.input} value={crop} onChange={(e) => onSetCrop(e.target.value)}>
+                  <option value="tomato">Tomatoes</option>
+                  <option value="rice">Rice</option>
+                  <option value="wheat">Wheat</option>
+                </select>
+              </label>
+              <label className={styles.label}>
+                Quantity (tonnes)
+                <input
+                  className={styles.input}
+                  type="number"
+                  min={1}
+                  value={quantity}
+                  onChange={(e) => onSetQuantity(Number(e.target.value) || 1)}
+                />
+              </label>
+              <label className={styles.label}>
+                Urgency
+                <select className={styles.input} value={urgency} onChange={(e) => onSetUrgency(e.target.value)}>
+                  <option>Standard</option>
+                  <option>High (48h)</option>
+                  <option>Emergency (24h)</option>
+                </select>
+              </label>
+              <label className={styles.label}>
+                Delivery window
+                <select className={styles.input} value={deliveryWindow} onChange={(e) => onSetDeliveryWindow(e.target.value)}>
+                  <option>3-5 days</option>
+                  <option>1-2 days</option>
+                  <option>Same day</option>
+                </select>
+              </label>
+              <label className={styles.label}>
+                Price cap (optional)
+                <input
+                  className={styles.input}
+                  type="number"
+                  placeholder="INR/tonne"
+                  value={priceCap}
+                  onChange={(e) => onSetPriceCap(e.target.value)}
+                />
+              </label>
+              <label className={styles.blindToggle} htmlFor="climateMode">
+                <input
+                  id="climateMode"
+                  type="checkbox"
+                  checked={climateMode}
+                  onChange={(e) => onToggleClimateMode(e.target.checked)}
+                />
+                Climate-adjusted mode
+              </label>
             </div>
-            <p>{status === 'idle' ? 'Waiting to start.' : `Processed ${processed}/${bulkSize} resumes (${progress}%)`}</p>
-            <p>
-              <span className={styles.eta}>ETA: {etaSeconds === '--' ? '--' : `${etaSeconds}s`}</span> | <span className={styles.throughput}>Throughput: {throughput} resumes/min</span>
-            </p>
-          </div>
-          <button className={styles.primaryButton} type="button" onClick={onStartProcessing}>
-            {status === 'running' ? 'Re-run Processing' : 'Start Processing'}
-          </button>
-        </article>
+          </article>
+
+          <article className={styles.panel}>
+            <h3>Weights (Cost / Time / Carbon)</h3>
+            <div className={styles.formGrid}>
+              <label className={styles.label}>
+                Cost weight
+                <input
+                  className={styles.input}
+                  type="range"
+                  min={0}
+                  max={100}
+                  value={weights.cost}
+                  onChange={(e) => onWeightChange('cost')(Number(e.target.value))}
+                />
+                <small className={styles.smallText}>{weights.cost}%</small>
+              </label>
+              <label className={styles.label}>
+                Time weight
+                <input
+                  className={styles.input}
+                  type="range"
+                  min={0}
+                  max={100}
+                  value={weights.time}
+                  onChange={(e) => onWeightChange('time')(Number(e.target.value))}
+                />
+                <small className={styles.smallText}>{weights.time}%</small>
+              </label>
+              <label className={styles.label}>
+                Carbon weight
+                <input
+                  className={styles.input}
+                  type="range"
+                  min={0}
+                  max={100}
+                  value={weights.carbon}
+                  onChange={(e) => onWeightChange('carbon')(Number(e.target.value))}
+                />
+                <small className={styles.smallText}>{weights.carbon}%</small>
+              </label>
+            </div>
+            <div className={styles.progressWrap} aria-live="polite">
+              <div className={styles.progressTrack}>
+                <div className={styles.progressFill} style={{ width: `${progress}%` }} />
+              </div>
+              <p>{status === 'idle' ? 'Waiting to run optimization.' : `Generating recommendations (${progress}%)`}</p>
+            </div>
+            <button className={styles.primaryButton} type="button" onClick={onRunOptimization}>
+              {status === 'running' ? 'Running...' : 'Run Optimization Demo'}
+            </button>
+          </article>
         </div>
 
         <article className={styles.panel}>
           <div className={styles.sectionHead}>
-            <h3>Ranked Shortlist</h3>
-            <label className={styles.blindToggle} htmlFor="blindMode">
-              <input id="blindMode" type="checkbox" checked={blindMode} onChange={(e) => onBlindModeChange(e.target.checked)} />
-              Blind screening mode
-            </label>
+            <h3>Ranked Recommendations</h3>
+            <span className={styles.smallText}>Best cost • Fastest • Lowest carbon</span>
           </div>
           <div className={styles.tableWrap}>
             <table className={styles.table}>
               <thead>
                 <tr>
                   <th>Rank</th>
-                  <th>Candidate</th>
-                  <th>Role Fit</th>
-                  <th>Final Score</th>
-                  <th>Explainability</th>
-                  <th>Skill Gaps</th>
+                  <th>Source State</th>
+                  <th>Price / tonne</th>
+                  <th>Distance (km)</th>
+                  <th>Transport</th>
+                  <th>Total Cost</th>
+                  <th>ETA (days)</th>
+                  <th>Carbon (tCO₂e)</th>
+                  <th>Savings vs max</th>
+                  <th>Highlight</th>
                 </tr>
               </thead>
               <tbody>
-                {ranked.length === 0 && (
+                {recommendations.length === 0 && (
                   <tr>
-                    <td colSpan={6}>No shortlist yet. Run processing to generate top candidates.</td>
+                    <td colSpan={10}>No results yet. Run optimization to view ranked options.</td>
                   </tr>
                 )}
-                {ranked.map((candidate, index) => (
-                  <tr key={candidate.id}>
+                {recommendations.map((rec, index) => (
+                  <tr key={rec.id}>
                     <td className={styles.rank}>#{index + 1}</td>
-                    <td>
-                      <p>{blindMode ? `Candidate ${candidate.id}` : candidate.name}</p>
-                      <small className={styles.smallText}>{blindMode ? 'Hidden profile' : `${candidate.college}, ${candidate.location}`}</small>
-                    </td>
-                    <td>{candidate.role}</td>
-                    <td className={styles.score}>{candidate.finalScore.toFixed(1)}%</td>
-                    <td>
-                      <small className={`${styles.smallText} ${styles.technicalMetric}`}>
-                        Skill {candidate.skillMatch.toFixed(0)} | Projects {candidate.projectSimilarity.toFixed(0)} | Exp {candidate.experienceFit.toFixed(0)}
-                      </small>
-                    </td>
-                    <td>{candidate.skillGaps.join(', ')}</td>
+                    <td>{rec.sourceState}</td>
+                    <td>₹{rec.pricePerTonne.toLocaleString()}</td>
+                    <td>{rec.distanceKm}</td>
+                    <td>₹{rec.transportCost.toLocaleString()}</td>
+                    <td className={styles.score}>₹{rec.totalCost.toLocaleString()}</td>
+                    <td>{rec.etaDays}</td>
+                    <td>{rec.carbonTons.toFixed(3)}</td>
+                    <td className={styles.percentage}>₹{rec.savingsVsMax.toLocaleString()}</td>
+                    <td>{rec.highlight ? rec.highlight.replace('_', ' ') : '-'}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
+          </div>
+        </article>
+
+        <article className={styles.panel}>
+          <h3>Impact Snapshot</h3>
+          <div className={styles.formGrid}>
+            <div>
+              <p className={styles.smallText}>Total savings</p>
+              <p className={styles.score}>₹{(impacts?.totalSavings ?? 0).toLocaleString()}</p>
+            </div>
+            <div>
+              <p className={styles.smallText}>Carbon reduction</p>
+              <p className={styles.score}>{(impacts?.carbonReductionPct ?? 0).toFixed(1)}%</p>
+            </div>
+            <div>
+              <p className={styles.smallText}>Time saved</p>
+              <p className={styles.score}>{(impacts?.timeSavedHours ?? 0).toFixed(1)} hrs</p>
+            </div>
+            <div>
+              <p className={styles.smallText}>Confidence</p>
+              <p className={styles.score}>{(impacts?.confidence ?? 0).toFixed(0)}%</p>
+            </div>
           </div>
         </article>
       </div>

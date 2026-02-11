@@ -10,9 +10,9 @@ type AuthPageProps = {
   password: string;
   confirmPassword: string;
   phoneNumber: string;
-  age: string;
-  gender: string;
-  address: string;
+  state: string;
+  department: string;
+  note: string;
   authError: string | null;
   onSetRoleChoice: (role: Role) => void;
   onSetName: (value: string) => void;
@@ -20,9 +20,9 @@ type AuthPageProps = {
   onSetPassword: (value: string) => void;
   onSetConfirmPassword: (value: string) => void;
   onSetPhoneNumber: (value: string) => void;
-  onSetAge: (value: string) => void;
-  onSetGender: (value: string) => void;
-  onSetAddress: (value: string) => void;
+  onSetState: (value: string) => void;
+  onSetDepartment: (value: string) => void;
+  onSetNote: (value: string) => void;
   onSwitchMode: () => void;
   onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
 };
@@ -35,9 +35,9 @@ function AuthPage({
   password,
   confirmPassword,
   phoneNumber,
-  age,
-  gender,
-  address,
+  state,
+  department,
+  note,
   authError,
   onSetRoleChoice,
   onSetName,
@@ -45,37 +45,37 @@ function AuthPage({
   onSetPassword,
   onSetConfirmPassword,
   onSetPhoneNumber,
-  onSetAge,
-  onSetGender,
-  onSetAddress,
+  onSetState,
+  onSetDepartment,
+  onSetNote,
   onSwitchMode,
   onSubmit
 }: AuthPageProps) {
   return (
     <section className={styles.shell}>
       <article className={styles.card}>
-        <h2 className={styles.title}>{authMode === 'signin' ? 'Sign in' : 'Sign up'}</h2>
+        <h2 className={styles.title}>{authMode === 'signin' ? 'Sign in' : 'Request Demo Access'}</h2>
         <p className={styles.subtle}>
           {authMode === 'signin'
-            ? 'Access your student or recruiter workspace.'
-            : 'Create your account and choose how you will use TalentForge.'}
+            ? 'Access your Bharat Krishi Setu workspace.'
+            : 'Request access to the Bharat Krishi Setu pilot environment.'}
         </p>
 
         {authMode === 'signup' && (
           <div className={styles.roleToggle} role="tablist" aria-label="Choose user role">
             <button
               type="button"
-              className={`${styles.roleButton} ${roleChoice === 'student' ? styles.active : ''}`}
-              onClick={() => onSetRoleChoice('student')}
+              className={`${styles.roleButton} ${roleChoice === 'state_officer' ? styles.active : ''}`}
+              onClick={() => onSetRoleChoice('state_officer')}
             >
-              Student
+              State Procurement Officer
             </button>
             <button
               type="button"
-              className={`${styles.roleButton} ${roleChoice === 'recruiter' ? styles.active : ''}`}
-              onClick={() => onSetRoleChoice('recruiter')}
+              className={`${styles.roleButton} ${roleChoice === 'central_admin' ? styles.active : ''}`}
+              onClick={() => onSetRoleChoice('central_admin')}
             >
-              Recruiter
+              Central Admin
             </button>
           </div>
         )}
@@ -135,49 +135,47 @@ function AuthPage({
                 />
               </label>
               <label className={styles.label}>
-                Age
-                <input
-                  className={styles.input}
-                  type="number"
-                  min={1}
-                  max={120}
-                  value={age}
-                  onChange={(e) => onSetAge(e.target.value)}
-                  placeholder="e.g. 22"
-                />
-              </label>
-              <label className={styles.label}>
-                Gender
+                State
                 <input
                   className={styles.input}
                   type="text"
-                  value={gender}
-                  onChange={(e) => onSetGender(e.target.value)}
-                  placeholder="e.g. Male"
+                  value={state}
+                  onChange={(e) => onSetState(e.target.value)}
+                  placeholder="e.g. Telangana"
                 />
               </label>
               <label className={styles.label}>
-                Address
+                Department / Role
                 <input
                   className={styles.input}
                   type="text"
-                  value={address}
-                  onChange={(e) => onSetAddress(e.target.value)}
-                  placeholder="e.g. Some address"
+                  value={department}
+                  onChange={(e) => onSetDepartment(e.target.value)}
+                  placeholder="e.g. Procurement Officer"
+                />
+              </label>
+              <label className={styles.label}>
+                Notes for pilot (optional)
+                <input
+                  className={styles.input}
+                  type="text"
+                  value={note}
+                  onChange={(e) => onSetNote(e.target.value)}
+                  placeholder="Share procurement priorities"
                 />
               </label>
             </>
           )}
           {authError && <p className={styles.error} role="alert">{authError}</p>}
           <button className={styles.primaryButton} type="submit">
-            {authMode === 'signin' ? 'Continue to Home' : 'Create and Continue'}
+            {authMode === 'signin' ? 'Continue to Dashboard' : 'Request Demo Access'}
           </button>
         </form>
 
         <p className={styles.switchText}>
-          {authMode === 'signin' ? "Don't have an account?" : 'Already have an account?'}{' '}
+          {authMode === 'signin' ? "Don't have access?" : 'Already have access?'}{' '}
           <button type="button" className={styles.linkButton} onClick={onSwitchMode}>
-            {authMode === 'signin' ? 'Sign up' : 'Sign in'}
+            {authMode === 'signin' ? 'Request demo' : 'Sign in'}
           </button>
         </p>
       </article>

@@ -1,11 +1,11 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { motion } from 'framer-motion';
-import * as S from './stylecomponent';
-import Antigravity from '../Antigravity';
+import React, { useEffect, useRef, useState } from "react";
+import { motion } from "framer-motion";
+import * as S from "./stylecomponent";
+import Antigravity from "../Antigravity";
 
 type LandingPageProps = {
-  onRecruiterSignUp: () => void;
-  onStudentSignUp: () => void;
+  onRequestDemo: () => void;
+  onViewSandbox: () => void;
   onSignIn: () => void;
 };
 
@@ -33,7 +33,7 @@ function useScrollAnimation() {
           setIsVisible(true);
         }
       },
-      { threshold: 0.1 }
+      { threshold: 0.1 },
     );
 
     if (ref.current) {
@@ -61,10 +61,18 @@ function AnimatedSection({ children, delay = 0 }: AnimatedSectionProps) {
   );
 }
 
-function AnimatedMetric({ stat, label, delay = 0 }: { stat: string; label: string; delay?: number }) {
-  const numericValue = parseFloat(stat.replace(/[^0-9.]/g, ''));
+function AnimatedMetric({
+  stat,
+  label,
+  delay = 0,
+}: {
+  stat: string;
+  label: string;
+  delay?: number;
+}) {
+  const numericValue = parseFloat(stat.replace(/[^0-9.]/g, ""));
   const hasNumber = !isNaN(numericValue);
-  const suffix = stat.replace(/[0-9.]/g, '');
+  const suffix = stat.replace(/[0-9.]/g, "");
 
   const [sectionRef, isVisible] = useScrollAnimation();
   const [count, setCount] = useState(hasNumber ? 0 : stat);
@@ -92,9 +100,7 @@ function AnimatedMetric({ stat, label, delay = 0 }: { stat: string; label: strin
 
   return (
     <S.MetricCard ref={sectionRef} $delay={delay} $isVisible={isVisible}>
-      <S.MetricValue>
-        {hasNumber ? `${count}${suffix}` : stat}
-      </S.MetricValue>
+      <S.MetricValue>{hasNumber ? `${count}${suffix}` : stat}</S.MetricValue>
       <S.MetricLabel>{label}</S.MetricLabel>
     </S.MetricCard>
   );
@@ -112,8 +118,17 @@ function FeatureCard({ title, description, delay = 0 }: FeatureCardProps) {
   );
 }
 
-function Hero({ onPrimaryClick, onSecondaryClick, onSignIn }: { onPrimaryClick: () => void; onSecondaryClick: () => void; onSignIn: () => void }) {
-  const titleText = "Hire Smarter. Screen Faster. Stay Fair.";
+function Hero({
+  onPrimaryClick,
+  onSecondaryClick,
+  onSignIn,
+}: {
+  onPrimaryClick: () => void;
+  onSecondaryClick: () => void;
+  onSignIn: () => void;
+}) {
+  const titleText =
+    "National Inter-State Agricultural Intelligence & Optimization Platform";
   const words = titleText.split(" ");
 
   return (
@@ -125,7 +140,7 @@ function Hero({ onPrimaryClick, onSecondaryClick, onSignIn }: { onPrimaryClick: 
       <S.HeroContentNew>
         <S.HeroBadge>
           <S.BadgeDot />
-          TalentForge AI
+          Bharat Krishi Setu
         </S.HeroBadge>
 
         <S.HeroTitleNew>
@@ -152,7 +167,8 @@ function Hero({ onPrimaryClick, onSecondaryClick, onSignIn }: { onPrimaryClick: 
           animate={{ opacity: 1 }}
           transition={{ duration: 0.3, delay: 0.8 }}
         >
-          Transform your hiring process with AI-powered candidate screening that's fast, transparent, and fair.
+          AI-powered recommendations to help every state buy and sell crops
+          smarter—cutting cost, delivery time, and carbon footprint.
         </S.HeroSubtitleNew>
 
         <S.CTAGroupNew
@@ -162,10 +178,10 @@ function Hero({ onPrimaryClick, onSecondaryClick, onSignIn }: { onPrimaryClick: 
           transition={{ duration: 0.3, delay: 1 }}
         >
           <S.ButtonPrimary type="button" onClick={onPrimaryClick}>
-            Get Started Free
+            Request Demo
           </S.ButtonPrimary>
           <S.ButtonSecondary type="button" onClick={onSecondaryClick}>
-            See How It Works
+            View Sandbox Data
           </S.ButtonSecondary>
         </S.CTAGroupNew>
 
@@ -175,13 +191,13 @@ function Hero({ onPrimaryClick, onSecondaryClick, onSignIn }: { onPrimaryClick: 
           animate={{ opacity: 1 }}
           transition={{ duration: 0.3, delay: 1.2 }}
         >
-          Already have an account?{' '}
+          Already have access?{" "}
           <S.SignInLink type="button" onClick={onSignIn}>
             Sign in
           </S.SignInLink>
         </S.SignInRowNew>
 
-        <S.HeroImageContainer
+        {/* <S.HeroImageContainer
           as={motion.div}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -189,59 +205,70 @@ function Hero({ onPrimaryClick, onSecondaryClick, onSignIn }: { onPrimaryClick: 
         >
           <S.HeroImageWrapper>
             <img
-              src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=1200&h=600&fit=crop"
-              alt="AI-powered hiring platform"
+              src="https://images.unsplash.com/photo-1501004318641-b39e6451bec6?w=1200&h=600&fit=crop"
+              alt="Inter-state agricultural logistics"
             />
           </S.HeroImageWrapper>
-        </S.HeroImageContainer>
+        </S.HeroImageContainer> */}
       </S.HeroContentNew>
     </S.HeroSectionNew>
   );
 }
 
-function LandingPage({ onRecruiterSignUp, onStudentSignUp, onSignIn }: LandingPageProps) {
+function LandingPage({
+  onRequestDemo,
+  onViewSandbox,
+  onSignIn,
+}: LandingPageProps) {
   const metrics = [
-    { stat: '70%', label: 'Faster screening time' },
-    { stat: '500+', label: 'Resumes processed per hour' },
-    { stat: '80%+', label: 'Shortlist precision' },
-    { stat: '100%', label: 'Transparent AI scoring' }
+    { stat: "10-20%", label: "Procurement cost reduction target" },
+    { stat: "<5s", label: "Recommendation SLA" },
+    { stat: "29", label: "States covered" },
+    { stat: "Carbon", label: "Carbon-aware routing built-in" },
   ];
 
   const features = [
     {
-      title: 'Explainable AI',
-      description: 'Every ranking decision comes with clear, understandable reasoning you can trust and defend.'
+      title: "Optimization Engine",
+      description:
+        "Ranks source states by total cost, time, and carbon with configurable weights.",
     },
     {
-      title: 'Blind Screening',
-      description: 'Reduce unconscious bias by hiding identity information during initial evaluation.'
+      title: "Live Availability",
+      description:
+        "Ingests government crop yield & price feeds to keep decisions current.",
     },
     {
-      title: 'Bulk Processing',
-      description: 'Handle hundreds to thousands of resumes with consistent quality and speed.'
+      title: "Impact Dashboard",
+      description:
+        "Savings, carbon reduction, and delivery time improvements for every decision.",
     },
     {
-      title: 'Smart Matching',
-      description: 'AI understands context and skills, not just keywords, for better candidate fit.'
-    }
+      title: "Alerts & Forecasts",
+      description:
+        "Shortage warnings, surplus redirection, and disaster signals for proactive action.",
+    },
   ];
 
   const steps = [
     {
-      number: '01',
-      title: 'Upload Resumes',
-      description: 'Simply drag and drop your resume files or connect your ATS. We support PDF, DOCX, and CSV formats.'
+      number: "01",
+      title: "Connect Data",
+      description:
+        "Sync state crop availability, prices, and logistics baselines.",
     },
     {
-      number: '02',
-      title: 'AI Analysis',
-      description: 'Our AI analyzes each resume for skills, experience, and role fit using semantic understanding.'
+      number: "02",
+      title: "Enter Demand",
+      description:
+        "Specify crop, required quantity, urgency, and delivery window.",
     },
     {
-      number: '03',
-      title: 'Get Results',
-      description: 'Receive ranked candidates with transparent scoring and actionable insights in minutes.'
-    }
+      number: "03",
+      title: "Get Ranked Options",
+      description:
+        "See best cost, fastest, and lowest-carbon sourcing paths instantly.",
+    },
   ];
 
   return (
@@ -266,12 +293,21 @@ function LandingPage({ onRecruiterSignUp, onStudentSignUp, onSignIn }: LandingPa
         />
       </S.AntigravityWrapper>
       <S.Container>
-        <Hero onPrimaryClick={onRecruiterSignUp} onSecondaryClick={onStudentSignUp} onSignIn={onSignIn} />
+        <Hero
+          onPrimaryClick={onRequestDemo}
+          onSecondaryClick={onViewSandbox}
+          onSignIn={onSignIn}
+        />
 
         <AnimatedSection delay={0.1}>
           <S.MetricsSection>
             {metrics.map((metric, index) => (
-              <AnimatedMetric key={metric.label} stat={metric.stat} label={metric.label} delay={index * 0.1} />
+              <AnimatedMetric
+                key={metric.label}
+                stat={metric.stat}
+                label={metric.label}
+                delay={index * 0.1}
+              />
             ))}
           </S.MetricsSection>
         </AnimatedSection>
@@ -280,7 +316,9 @@ function LandingPage({ onRecruiterSignUp, onStudentSignUp, onSignIn }: LandingPa
           <S.Section>
             <S.SectionHeader>
               <S.SectionTitle>How It Works</S.SectionTitle>
-              <S.SectionSubtitle>Three simple steps to transform your hiring process</S.SectionSubtitle>
+              <S.SectionSubtitle>
+                Three steps to optimize inter-state crop sourcing
+              </S.SectionSubtitle>
             </S.SectionHeader>
             <S.StepsGrid>
               {steps.map((step, index) => (
@@ -300,11 +338,18 @@ function LandingPage({ onRecruiterSignUp, onStudentSignUp, onSignIn }: LandingPa
           <S.Section>
             <S.SectionHeader>
               <S.SectionTitle>Powerful Features</S.SectionTitle>
-              <S.SectionSubtitle>Everything you need for smarter, fairer hiring</S.SectionSubtitle>
+              <S.SectionSubtitle>
+                Everything you need for smarter, faster, greener procurement
+              </S.SectionSubtitle>
             </S.SectionHeader>
             <S.FeaturesGrid>
               {features.map((feature, index) => (
-                <FeatureCard key={feature.title} title={feature.title} description={feature.description} delay={index * 0.1} />
+                <FeatureCard
+                  key={feature.title}
+                  title={feature.title}
+                  description={feature.description}
+                  delay={index * 0.1}
+                />
               ))}
             </S.FeaturesGrid>
           </S.Section>
@@ -312,13 +357,21 @@ function LandingPage({ onRecruiterSignUp, onStudentSignUp, onSignIn }: LandingPa
 
         <AnimatedSection delay={0.4}>
           <S.CTASection>
-            <S.CTATitle>Ready to Transform Your Hiring?</S.CTATitle>
+            <S.CTATitle>Ready to Optimize Inter-State Procurement?</S.CTATitle>
             <S.CTADescription>
-              Join forward-thinking teams using AI to make hiring faster, fairer, and more transparent.
+              Pilot Bharat Krishi Setu to cut costs, speed deliveries, and
+              shrink carbon emissions.
             </S.CTADescription>
-            <S.CTAButton type="button" onClick={onRecruiterSignUp}>
-              Start Free Trial
+            <S.CTAButton type="button" onClick={onRequestDemo}>
+              Request Government Pilot
             </S.CTAButton>
+            <S.ButtonSecondary
+              type="button"
+              style={{ marginTop: "0.75rem" }}
+              onClick={onViewSandbox}
+            >
+              Explore Sandbox Data
+            </S.ButtonSecondary>
           </S.CTASection>
         </AnimatedSection>
       </S.Container>

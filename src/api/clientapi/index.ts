@@ -27,7 +27,7 @@ export function setRefreshToken(token: string): void {
 
 export function getStoredRole(): Role | null {
   const r = localStorage.getItem(ROLE_KEY);
-  if (r === 'student' || r === 'recruiter') return r;
+  if (r === 'state_officer' || r === 'central_admin') return r;
   return null;
 }
 

@@ -839,3 +839,5 @@ export const CTAButton = styled.button`
     outline-offset: 2px;
   }
 `;
+
+// New minimal hero overlay layout

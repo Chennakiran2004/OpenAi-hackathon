@@ -14,16 +14,16 @@ function TopBar({ isLoggedIn, onBrandClick, onSignIn, onSignUp, onLogout }: TopB
     <header className={styles.header}>
       <div className={styles.navbar}>
         <button type="button" className={styles.brandButton} onClick={onBrandClick}>
-          <span className={styles.brand}>TalentForge AI</span>
+          <span className={styles.brand}>Bharat Krishi Setu (BKS)</span>
         </button>
         <div className={styles.actions}>
           {!isLoggedIn && (
             <>
               <button className={styles.secondaryButton} type="button" onClick={onSignIn}>
-                Sign in
+                View Sandbox
               </button>
               <button className={styles.primaryButton} type="button" onClick={onSignUp}>
-                Sign up
+                Request Demo
               </button>
             </>
           )}
