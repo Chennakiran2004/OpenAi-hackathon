@@ -1,5 +1,5 @@
 export type Role = 'student' | 'recruiter';
-export type View = 'landing' | 'auth' | 'home';
+export type View = 'landing' | 'auth' | 'home' | 'profile';
 export type AuthMode = 'signin' | 'signup';
 
 export type User = {

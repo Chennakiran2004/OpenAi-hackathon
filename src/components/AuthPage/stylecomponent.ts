@@ -150,6 +150,16 @@ const authCss = `
   outline-offset: 2px;
 }
 
+.auth-error {
+  margin: 0;
+  padding: 0.6rem 0.75rem;
+  border-radius: 8px;
+  background: rgba(180, 60, 60, 0.2);
+  border: 1px solid rgba(180, 60, 60, 0.5);
+  color: #e88;
+  font-size: 0.875rem;
+}
+
 .auth-switch {
   margin: 1.5rem 0 0;
   text-align: center;
@@ -199,6 +209,7 @@ export const authPageStyles = {
   label: 'auth-label',
   input: 'auth-input',
   primaryButton: 'auth-btn-primary',
+  error: 'auth-error',
   switchText: 'auth-switch',
   linkButton: 'auth-link-btn'
 };

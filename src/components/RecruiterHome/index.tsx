@@ -33,12 +33,13 @@ function RecruiterHome({
 }: RecruiterHomeProps) {
   return (
     <section className={styles.section}>
-      <div className={styles.header}>
-        <h2>Recruiter Home</h2>
-        <p>Welcome {name}. Create jobs, upload resume batches, and shortlist candidates with explainable fair ranking.</p>
-      </div>
+      <div className={styles.inner}>
+        <div className={styles.header}>
+          <h2>Recruiter Home</h2>
+          <p>Welcome {name}. Create jobs, upload resume batches, and shortlist candidates with explainable fair ranking.</p>
+        </div>
 
-      <div className={styles.twoCol}>
+        <div className={styles.twoCol}>
         <article className={styles.panel}>
           <h3>Create Job Post</h3>
           <div className={styles.formGrid}>
@@ -95,55 +96,56 @@ function RecruiterHome({
             {status === 'running' ? 'Re-run Processing' : 'Start Processing'}
           </button>
         </article>
-      </div>
+        </div>
 
-      <article className={styles.panel}>
-        <div className={styles.sectionHead}>
-          <h3>Ranked Shortlist</h3>
-          <label className={styles.blindToggle} htmlFor="blindMode">
-            <input id="blindMode" type="checkbox" checked={blindMode} onChange={(e) => onBlindModeChange(e.target.checked)} />
-            Blind screening mode
-          </label>
-        </div>
-        <div className={styles.tableWrap}>
-          <table className={styles.table}>
-            <thead>
-              <tr>
-                <th>Rank</th>
-                <th>Candidate</th>
-                <th>Role Fit</th>
-                <th>Final Score</th>
-                <th>Explainability</th>
-                <th>Skill Gaps</th>
-              </tr>
-            </thead>
-            <tbody>
-              {ranked.length === 0 && (
+        <article className={styles.panel}>
+          <div className={styles.sectionHead}>
+            <h3>Ranked Shortlist</h3>
+            <label className={styles.blindToggle} htmlFor="blindMode">
+              <input id="blindMode" type="checkbox" checked={blindMode} onChange={(e) => onBlindModeChange(e.target.checked)} />
+              Blind screening mode
+            </label>
+          </div>
+          <div className={styles.tableWrap}>
+            <table className={styles.table}>
+              <thead>
                 <tr>
-                  <td colSpan={6}>No shortlist yet. Run processing to generate top candidates.</td>
+                  <th>Rank</th>
+                  <th>Candidate</th>
+                  <th>Role Fit</th>
+                  <th>Final Score</th>
+                  <th>Explainability</th>
+                  <th>Skill Gaps</th>
                 </tr>
-              )}
-              {ranked.map((candidate, index) => (
-                <tr key={candidate.id}>
-                  <td className={styles.rank}>#{index + 1}</td>
-                  <td>
-                    <p>{blindMode ? `Candidate ${candidate.id}` : candidate.name}</p>
-                    <small className={styles.smallText}>{blindMode ? 'Hidden profile' : `${candidate.college}, ${candidate.location}`}</small>
-                  </td>
-                  <td>{candidate.role}</td>
-                  <td className={styles.score}>{candidate.finalScore.toFixed(1)}%</td>
-                  <td>
-                    <small className={`${styles.smallText} ${styles.technicalMetric}`}>
-                      Skill {candidate.skillMatch.toFixed(0)} | Projects {candidate.projectSimilarity.toFixed(0)} | Exp {candidate.experienceFit.toFixed(0)}
-                    </small>
-                  </td>
-                  <td>{candidate.skillGaps.join(', ')}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </article>
+              </thead>
+              <tbody>
+                {ranked.length === 0 && (
+                  <tr>
+                    <td colSpan={6}>No shortlist yet. Run processing to generate top candidates.</td>
+                  </tr>
+                )}
+                {ranked.map((candidate, index) => (
+                  <tr key={candidate.id}>
+                    <td className={styles.rank}>#{index + 1}</td>
+                    <td>
+                      <p>{blindMode ? `Candidate ${candidate.id}` : candidate.name}</p>
+                      <small className={styles.smallText}>{blindMode ? 'Hidden profile' : `${candidate.college}, ${candidate.location}`}</small>
+                    </td>
+                    <td>{candidate.role}</td>
+                    <td className={styles.score}>{candidate.finalScore.toFixed(1)}%</td>
+                    <td>
+                      <small className={`${styles.smallText} ${styles.technicalMetric}`}>
+                        Skill {candidate.skillMatch.toFixed(0)} | Projects {candidate.projectSimilarity.toFixed(0)} | Exp {candidate.experienceFit.toFixed(0)}
+                      </small>
+                    </td>
+                    <td>{candidate.skillGaps.join(', ')}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </article>
+      </div>
     </section>
   );
 }

@@ -1,12 +1,30 @@
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import {
+  clearAccessToken,
+  getAccessToken,
+  getErrorMessage,
+  getProfile,
+  getStoredRole,
+  setAccessToken,
+  setStoredRole,
+  signin as apiSignin,
+  signup as apiSignup
+} from './api/clientapi';
+import type { SignupPayload } from './api/types';
 import AuthPage from './components/AuthPage';
 import LandingPage from './components/LandingPage';
+import ProfilePage from './components/ProfilePage';
 import RecruiterHome from './components/RecruiterHome';
 import StudentHome from './components/StudentHome';
+import HomeNavbar from './components/HomeNavbar';
 import TopBar from './components/TopBar';
 import { createCandidate } from './components/candidateUtils';
 import { AuthMode, Candidate, ProcessingStatus, Role, User, View } from './components/types';
 import { appStyles as styles } from './stylecomponent';
+
+function profileToUser(profile: { username: string; email: string }, role: Role): User {
+  return { name: profile.username, email: profile.email, role };
+}
 
 function App() {
   const [view, setView] = useState<View>('landing');
@@ -17,6 +35,12 @@ function App() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [age, setAge] = useState('');
+  const [gender, setGender] = useState('');
+  const [address, setAddress] = useState('');
+  const [authError, setAuthError] = useState<string | null>(null);
 
   const [bulkSize, setBulkSize] = useState(500);
   const [processed, setProcessed] = useState(0);
@@ -49,31 +73,91 @@ function App() {
     return Math.ceil(left / ratePerMs / 1000).toString();
   }, [status, processed, elapsedMs, bulkSize]);
 
-  const openAuth = (mode: AuthMode, role?: Role) => {
-    if (role) {
-      setRoleChoice(role);
-    }
+  useEffect(() => {
+    const token = getAccessToken();
+    if (!token) return;
+    getProfile()
+      .then((profile) => {
+        const role = getStoredRole() || 'student';
+        setUser(profileToUser(profile, role));
+        setView('home');
+      })
+      .catch(() => {
+        clearAccessToken();
+      });
+  }, []);
+
+  const openAuth = useCallback((mode: AuthMode, role?: Role) => {
+    if (role) setRoleChoice(role);
     setAuthMode(mode);
+    setAuthError(null);
     setView('auth');
-  };
+  }, []);
 
-  const submitAuth = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  const submitAuth = useCallback(
+    async (event: React.FormEvent<HTMLFormElement>) => {
+      event.preventDefault();
+      setAuthError(null);
+      const trimmedEmail = email.trim();
+      const trimmedPassword = password.trim();
 
-    const resolvedName = name.trim() || (roleChoice === 'student' ? 'Student User' : 'Recruiter User');
-    const resolvedEmail = email.trim() || (roleChoice === 'student' ? 'student@talentforge.ai' : 'recruiter@talentforge.ai');
+      if (authMode === 'signin') {
+        try {
+          const { access } = await apiSignin(trimmedEmail, trimmedPassword);
+          setAccessToken(access);
+          setStoredRole(roleChoice);
+          const profile = await getProfile();
+          setUser(profileToUser(profile, roleChoice));
+          setView('home');
+        } catch (err) {
+          setAuthError(getErrorMessage(err));
+        }
+        return;
+      }
 
-    setUser({ name: resolvedName, email: resolvedEmail, role: roleChoice });
-    setView('home');
-  };
+      if (authMode === 'signup') {
+        if (trimmedPassword !== confirmPassword.trim()) {
+          setAuthError('Passwords do not match.');
+          return;
+        }
+        const payload: SignupPayload = {
+          email: trimmedEmail,
+          password: trimmedPassword,
+          confirm_password: confirmPassword.trim(),
+          username: name.trim() || trimmedEmail.split('@')[0] || 'user',
+          phone_number: phoneNumber.trim(),
+          age: Number(age) || 0,
+          gender: gender.trim() || 'Prefer not to say',
+          address: address.trim()
+        };
+        try {
+          const { access } = await apiSignup(payload);
+          setAccessToken(access);
+          setStoredRole(roleChoice);
+          const profile = await getProfile();
+          setUser(profileToUser(profile, roleChoice));
+          setView('home');
+        } catch (err) {
+          setAuthError(getErrorMessage(err));
+        }
+      }
+    },
+    [authMode, email, password, confirmPassword, name, phoneNumber, age, gender, address, roleChoice]
+  );
 
-  const logout = () => {
+  const logout = useCallback(() => {
+    clearAccessToken();
     setUser(null);
     setName('');
     setEmail('');
     setPassword('');
+    setConfirmPassword('');
+    setPhoneNumber('');
+    setAge('');
+    setGender('');
+    setAddress('');
     setView('landing');
-  };
+  }, []);
 
   const runRecruiterDemo = () => {
     const total = Math.max(100, Math.min(10000, bulkSize));
@@ -107,15 +191,25 @@ function App() {
     }, tickMs);
   };
 
+  const showHomeNav = view === 'home' || view === 'profile';
+
   return (
     <>
-      <TopBar
-        isLoggedIn={Boolean(user)}
-        onBrandClick={() => setView(user ? 'home' : 'landing')}
-        onSignIn={() => openAuth('signin')}
-        onSignUp={() => openAuth('signup')}
-        onLogout={logout}
-      />
+      {showHomeNav ? (
+        <HomeNavbar
+          onBrandClick={() => setView('home')}
+          onProfileClick={() => setView('profile')}
+          onLogout={logout}
+        />
+      ) : (
+        <TopBar
+          isLoggedIn={Boolean(user)}
+          onBrandClick={() => setView(user ? 'home' : 'landing')}
+          onSignIn={() => openAuth('signin')}
+          onSignUp={() => openAuth('signup')}
+          onLogout={logout}
+        />
+      )}
 
       <main className={`${styles.container} ${styles.main}`}>
         {view === 'landing' && (
@@ -133,11 +227,25 @@ function App() {
             name={name}
             email={email}
             password={password}
+            confirmPassword={confirmPassword}
+            phoneNumber={phoneNumber}
+            age={age}
+            gender={gender}
+            address={address}
+            authError={authError}
             onSetRoleChoice={setRoleChoice}
             onSetName={setName}
             onSetEmail={setEmail}
             onSetPassword={setPassword}
-            onSwitchMode={() => setAuthMode(authMode === 'signin' ? 'signup' : 'signin')}
+            onSetConfirmPassword={setConfirmPassword}
+            onSetPhoneNumber={setPhoneNumber}
+            onSetAge={setAge}
+            onSetGender={setGender}
+            onSetAddress={setAddress}
+            onSwitchMode={() => {
+              setAuthMode(authMode === 'signin' ? 'signup' : 'signin');
+              setAuthError(null);
+            }}
             onSubmit={submitAuth}
           />
         )}
@@ -158,6 +266,16 @@ function App() {
             onBulkSizeChange={setBulkSize}
             onBlindModeChange={setBlindMode}
             onStartProcessing={runRecruiterDemo}
+          />
+        )}
+
+        {view === 'profile' && user && (
+          <ProfilePage
+            user={user}
+            onUpdateProfile={({ name: newName, email: newEmail }) =>
+              setUser((u) => (u ? { ...u, name: newName, email: newEmail } : null))
+            }
+            onBackToHome={() => setView('home')}
           />
         )}
       </main>
