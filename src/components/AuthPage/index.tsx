@@ -1,64 +1,49 @@
 import React from 'react';
-import { AuthMode, Role } from '../types';
+import { useAuth } from '../../contexts/AuthContext';
 import { authPageStyles as styles } from './stylecomponent';
 
-type AuthPageProps = {
-  authMode: AuthMode;
-  roleChoice: Role;
-  name: string;
-  email: string;
-  password: string;
-  confirmPassword: string;
-  phoneNumber: string;
-  state: string;
-  department: string;
-  note: string;
-  authError: string | null;
-  onSetRoleChoice: (role: Role) => void;
-  onSetName: (value: string) => void;
-  onSetEmail: (value: string) => void;
-  onSetPassword: (value: string) => void;
-  onSetConfirmPassword: (value: string) => void;
-  onSetPhoneNumber: (value: string) => void;
-  onSetState: (value: string) => void;
-  onSetDepartment: (value: string) => void;
-  onSetNote: (value: string) => void;
-  onSwitchMode: () => void;
-  onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
-};
+function AuthPage() {
+  const {
+    authMode,
+    roleChoice,
+    setRoleChoice,
+    username,
+    setUsername,
+    password,
+    setPassword,
+    confirmPassword,
+    setConfirmPassword,
+    firstName,
+    setFirstName,
+    lastName,
+    setLastName,
+    email,
+    setEmail,
+    stateId,
+    setStateId,
+    districtId,
+    setDistrictId,
+    stateOptions,
+    districtOptions,
+    stateOptionsLoading,
+    districtOptionsLoading,
+    designation,
+    setDesignation,
+    authError,
+    submitAuth,
+    switchMode,
+  } = useAuth();
 
-function AuthPage({
-  authMode,
-  roleChoice,
-  name,
-  email,
-  password,
-  confirmPassword,
-  phoneNumber,
-  state,
-  department,
-  note,
-  authError,
-  onSetRoleChoice,
-  onSetName,
-  onSetEmail,
-  onSetPassword,
-  onSetConfirmPassword,
-  onSetPhoneNumber,
-  onSetState,
-  onSetDepartment,
-  onSetNote,
-  onSwitchMode,
-  onSubmit
-}: AuthPageProps) {
   return (
     <section className={styles.shell}>
       <article className={styles.card}>
-        <h2 className={styles.title}>{authMode === 'signin' ? 'Sign in' : 'Request Demo Access'}</h2>
+        <h2 className={styles.title}>
+          {authMode === 'signin' ? 'Sign in' : 'Register'}
+        </h2>
         <p className={styles.subtle}>
           {authMode === 'signin'
             ? 'Access your Bharat Krishi Setu workspace.'
-            : 'Request access to the Bharat Krishi Setu pilot environment.'}
+            : 'Create an account with optional state/district profile.'}
         </p>
 
         {authMode === 'signup' && (
@@ -66,36 +51,30 @@ function AuthPage({
             <button
               type="button"
               className={`${styles.roleButton} ${roleChoice === 'state_officer' ? styles.active : ''}`}
-              onClick={() => onSetRoleChoice('state_officer')}
+              onClick={() => setRoleChoice('state_officer')}
             >
               State Procurement Officer
             </button>
             <button
               type="button"
               className={`${styles.roleButton} ${roleChoice === 'central_admin' ? styles.active : ''}`}
-              onClick={() => onSetRoleChoice('central_admin')}
+              onClick={() => setRoleChoice('central_admin')}
             >
               Central Admin
             </button>
           </div>
         )}
 
-        <form className={styles.form} onSubmit={onSubmit}>
-          {authMode === 'signup' && (
-            <label className={styles.label}>
-              Full name
-              <input className={styles.input} value={name} onChange={(e) => onSetName(e.target.value)} placeholder="Enter your name" />
-            </label>
-          )}
+        <form className={styles.form} onSubmit={submitAuth}>
           <label className={styles.label}>
-            Email
+            Username
             <input
               className={styles.input}
-              type="email"
+              type="text"
               required
-              value={email}
-              onChange={(e) => onSetEmail(e.target.value)}
-              placeholder="you@example.com"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="Choose a username"
             />
           </label>
           <label className={styles.label}>
@@ -105,7 +84,7 @@ function AuthPage({
               type="password"
               required
               value={password}
-              onChange={(e) => onSetPassword(e.target.value)}
+              onChange={(e) => setPassword(e.target.value)}
               placeholder="Enter password"
             />
           </label>
@@ -117,7 +96,7 @@ function AuthPage({
                 type="password"
                 required
                 value={confirmPassword}
-                onChange={(e) => onSetConfirmPassword(e.target.value)}
+                onChange={(e) => setConfirmPassword(e.target.value)}
                 placeholder="Confirm password"
               />
             </label>
@@ -125,57 +104,93 @@ function AuthPage({
           {authMode === 'signup' && (
             <>
               <label className={styles.label}>
-                Phone number
+                Email (optional)
                 <input
                   className={styles.input}
-                  type="tel"
-                  value={phoneNumber}
-                  onChange={(e) => onSetPhoneNumber(e.target.value)}
-                  placeholder="e.g. 9999999999"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="you@example.com"
                 />
               </label>
               <label className={styles.label}>
-                State
+                First name (optional)
                 <input
                   className={styles.input}
                   type="text"
-                  value={state}
-                  onChange={(e) => onSetState(e.target.value)}
-                  placeholder="e.g. Telangana"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  placeholder="First name"
                 />
               </label>
               <label className={styles.label}>
-                Department / Role
+                Last name (optional)
                 <input
                   className={styles.input}
                   type="text"
-                  value={department}
-                  onChange={(e) => onSetDepartment(e.target.value)}
-                  placeholder="e.g. Procurement Officer"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  placeholder="Last name"
                 />
               </label>
               <label className={styles.label}>
-                Notes for pilot (optional)
+                State (optional)
+                <select
+                  className={styles.input}
+                  value={stateId === '' ? '' : stateId}
+                  onChange={(e) => setStateId(e.target.value === '' ? '' : Number(e.target.value))}
+                  disabled={stateOptionsLoading}
+                >
+                  <option value="">{stateOptionsLoading ? 'Loading…' : 'Select state (optional)'}</option>
+                  {stateOptions.map((s) => (
+                    <option key={s.id} value={s.id}>
+                      {s.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className={styles.label}>
+                District (optional)
+                <select
+                  className={styles.input}
+                  value={districtId === '' ? '' : districtId}
+                  onChange={(e) => setDistrictId(e.target.value === '' ? '' : Number(e.target.value))}
+                  disabled={stateId === '' || districtOptionsLoading}
+                >
+                  <option value="">{districtOptionsLoading ? 'Loading…' : 'Select district (optional)'}</option>
+                  {districtOptions.map((d) => (
+                    <option key={d.id} value={d.id}>
+                      {d.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className={styles.label}>
+                Designation (optional)
                 <input
                   className={styles.input}
                   type="text"
-                  value={note}
-                  onChange={(e) => onSetNote(e.target.value)}
-                  placeholder="Share procurement priorities"
+                  value={designation}
+                  onChange={(e) => setDesignation(e.target.value)}
+                  placeholder="e.g. District Agriculture Officer"
                 />
               </label>
             </>
           )}
-          {authError && <p className={styles.error} role="alert">{authError}</p>}
+          {authError && (
+            <p className={styles.error} role="alert">
+              {authError}
+            </p>
+          )}
           <button className={styles.primaryButton} type="submit">
-            {authMode === 'signin' ? 'Continue to Dashboard' : 'Request Demo Access'}
+            {authMode === 'signin' ? 'Continue to Dashboard' : 'Register'}
           </button>
         </form>
 
         <p className={styles.switchText}>
-          {authMode === 'signin' ? "Don't have access?" : 'Already have access?'}{' '}
-          <button type="button" className={styles.linkButton} onClick={onSwitchMode}>
-            {authMode === 'signin' ? 'Request demo' : 'Sign in'}
+          {authMode === 'signin' ? "Don't have an account?" : 'Already have an account?'}{' '}
+          <button type="button" className={styles.linkButton} onClick={switchMode}>
+            {authMode === 'signin' ? 'Register' : 'Sign in'}
           </button>
         </p>
       </article>

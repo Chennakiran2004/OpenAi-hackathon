@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import * as S from "./stylecomponent";
-import Antigravity from "../Antigravity";
+import IndiaNetworkBackground from "../background/IndiaNetworkBackground";
 
 type LandingPageProps = {
   onRequestDemo: () => void;
@@ -36,13 +36,14 @@ function useScrollAnimation() {
       { threshold: 0.1 },
     );
 
-    if (ref.current) {
-      observer.observe(ref.current);
+    const el = ref.current;
+    if (el) {
+      observer.observe(el);
     }
 
     return () => {
-      if (ref.current) {
-        observer.unobserve(ref.current);
+      if (el) {
+        observer.unobserve(el);
       }
     };
   }, []);
@@ -272,110 +273,94 @@ function LandingPage({
   ];
 
   return (
-    <S.Page>
-      <S.AntigravityWrapper>
-        <Antigravity
-          count={100}
-          magnetRadius={8}
-          ringRadius={10}
-          waveSpeed={0.2}
-          waveAmplitude={0.2}
-          particleSize={0.5}
-          lerpSpeed={0.1}
-          color="#666666"
-          autoAnimate={false}
-          particleVariance={1}
-          rotationSpeed={0.4}
-          depthFactor={0.4}
-          pulseSpeed={3}
-          particleShape="tetrahedron"
-          fieldStrength={10}
-        />
-      </S.AntigravityWrapper>
-      <S.Container>
-        <Hero
-          onPrimaryClick={onRequestDemo}
-          onSecondaryClick={onViewSandbox}
-          onSignIn={onSignIn}
-        />
+    <>
+      <IndiaNetworkBackground />
+      <S.Page>
+        <S.Container>
+          <Hero
+            onPrimaryClick={onRequestDemo}
+            onSecondaryClick={onViewSandbox}
+            onSignIn={onSignIn}
+          />
 
-        <AnimatedSection delay={0.1}>
-          <S.MetricsSection>
-            {metrics.map((metric, index) => (
-              <AnimatedMetric
-                key={metric.label}
-                stat={metric.stat}
-                label={metric.label}
-                delay={index * 0.1}
-              />
-            ))}
-          </S.MetricsSection>
-        </AnimatedSection>
-
-        <AnimatedSection delay={0.2}>
-          <S.Section>
-            <S.SectionHeader>
-              <S.SectionTitle>How It Works</S.SectionTitle>
-              <S.SectionSubtitle>
-                Three steps to optimize inter-state crop sourcing
-              </S.SectionSubtitle>
-            </S.SectionHeader>
-            <S.StepsGrid>
-              {steps.map((step, index) => (
-                <AnimatedSection key={step.number} delay={index * 0.15}>
-                  <S.StepCard>
-                    <S.StepNumber>{step.number}</S.StepNumber>
-                    <S.StepTitle>{step.title}</S.StepTitle>
-                    <S.StepBody>{step.description}</S.StepBody>
-                  </S.StepCard>
-                </AnimatedSection>
-              ))}
-            </S.StepsGrid>
-          </S.Section>
-        </AnimatedSection>
-
-        <AnimatedSection delay={0.3}>
-          <S.Section>
-            <S.SectionHeader>
-              <S.SectionTitle>Powerful Features</S.SectionTitle>
-              <S.SectionSubtitle>
-                Everything you need for smarter, faster, greener procurement
-              </S.SectionSubtitle>
-            </S.SectionHeader>
-            <S.FeaturesGrid>
-              {features.map((feature, index) => (
-                <FeatureCard
-                  key={feature.title}
-                  title={feature.title}
-                  description={feature.description}
+          <AnimatedSection delay={0.1}>
+            <S.MetricsSection>
+              {metrics.map((metric, index) => (
+                <AnimatedMetric
+                  key={metric.label}
+                  stat={metric.stat}
+                  label={metric.label}
                   delay={index * 0.1}
                 />
               ))}
-            </S.FeaturesGrid>
-          </S.Section>
-        </AnimatedSection>
+            </S.MetricsSection>
+          </AnimatedSection>
 
-        <AnimatedSection delay={0.4}>
-          <S.CTASection>
-            <S.CTATitle>Ready to Optimize Inter-State Procurement?</S.CTATitle>
-            <S.CTADescription>
-              Pilot Bharat Krishi Setu to cut costs, speed deliveries, and
-              shrink carbon emissions.
-            </S.CTADescription>
-            <S.CTAButton type="button" onClick={onRequestDemo}>
-              Request Government Pilot
-            </S.CTAButton>
-            <S.ButtonSecondary
-              type="button"
-              style={{ marginTop: "0.75rem" }}
-              onClick={onViewSandbox}
-            >
-              Explore Sandbox Data
-            </S.ButtonSecondary>
-          </S.CTASection>
-        </AnimatedSection>
-      </S.Container>
-    </S.Page>
+          <AnimatedSection delay={0.2}>
+            <S.Section>
+              <S.SectionHeader>
+                <S.SectionTitle>How It Works</S.SectionTitle>
+                <S.SectionSubtitle>
+                  Three steps to optimize inter-state crop sourcing
+                </S.SectionSubtitle>
+              </S.SectionHeader>
+              <S.StepsGrid>
+                {steps.map((step, index) => (
+                  <AnimatedSection key={step.number} delay={index * 0.15}>
+                    <S.StepCard>
+                      <S.StepNumber>{step.number}</S.StepNumber>
+                      <S.StepTitle>{step.title}</S.StepTitle>
+                      <S.StepBody>{step.description}</S.StepBody>
+                    </S.StepCard>
+                  </AnimatedSection>
+                ))}
+              </S.StepsGrid>
+            </S.Section>
+          </AnimatedSection>
+
+          <AnimatedSection delay={0.3}>
+            <S.Section>
+              <S.SectionHeader>
+                <S.SectionTitle>Powerful Features</S.SectionTitle>
+                <S.SectionSubtitle>
+                  Everything you need for smarter, faster, greener procurement
+                </S.SectionSubtitle>
+              </S.SectionHeader>
+              <S.FeaturesGrid>
+                {features.map((feature, index) => (
+                  <FeatureCard
+                    key={feature.title}
+                    title={feature.title}
+                    description={feature.description}
+                    delay={index * 0.1}
+                  />
+                ))}
+              </S.FeaturesGrid>
+            </S.Section>
+          </AnimatedSection>
+
+          <AnimatedSection delay={0.4}>
+            <S.CTASection>
+              <S.CTATitle>Ready to Optimize Inter-State Procurement?</S.CTATitle>
+              <S.CTADescription>
+                Pilot Bharat Krishi Setu to cut costs, speed deliveries, and
+                shrink carbon emissions.
+              </S.CTADescription>
+              <S.CTAButton type="button" onClick={onRequestDemo}>
+                Request Government Pilot
+              </S.CTAButton>
+              <S.ButtonSecondary
+                type="button"
+                style={{ marginTop: "0.75rem" }}
+                onClick={onViewSandbox}
+              >
+                Explore Sandbox Data
+              </S.ButtonSecondary>
+            </S.CTASection>
+          </AnimatedSection>
+        </S.Container>
+      </S.Page>
+    </>
   );
 }
 

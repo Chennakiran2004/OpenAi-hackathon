@@ -1,4 +1,4 @@
-import styled, { keyframes, css } from 'styled-components';
+import styled, { keyframes } from 'styled-components';
 
 // Animation keyframes
 const fadeInUp = keyframes`
@@ -74,9 +74,10 @@ export const Page = styled.div`
   --tf-shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.7);
   
   min-height: 100vh;
-  background: var(--tf-bg-page);
+  background: transparent;
   color: var(--tf-text-primary);
   position: relative;
+  z-index: 0;
   overflow-x: hidden;
 
   &::before {
@@ -87,8 +88,8 @@ export const Page = styled.div`
     right: 0;
     bottom: 0;
     background: 
-      radial-gradient(circle at 20% 30%, rgba(102, 102, 102, 0.05), transparent 50%),
-      radial-gradient(circle at 80% 70%, rgba(102, 102, 102, 0.03), transparent 50%);
+      radial-gradient(ellipse at 50% 30%, rgba(17, 17, 17, 0.4), transparent 60%),
+      radial-gradient(ellipse at 80% 70%, rgba(17, 17, 17, 0.2), transparent 50%);
     pointer-events: none;
     z-index: 0;
   }

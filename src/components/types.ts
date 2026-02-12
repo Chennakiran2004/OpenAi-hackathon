@@ -1,11 +1,18 @@
 export type Role = 'state_officer' | 'central_admin';
-export type View = 'landing' | 'auth' | 'home' | 'profile';
 export type AuthMode = 'signin' | 'signup';
+
+export type UserProfile = {
+  state_name?: string;
+  district_name?: string;
+  designation?: string;
+  phone?: string;
+};
 
 export type User = {
   name: string;
   email: string;
   role: Role;
+  profile?: UserProfile;
 };
 
 export type WeightConfig = {

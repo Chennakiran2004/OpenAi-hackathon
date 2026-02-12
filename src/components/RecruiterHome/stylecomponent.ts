@@ -185,6 +185,12 @@ const recruiterCss = `
   transform: translateY(0);
 }
 
+.rh-btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
 .rh-section-head {
   display: flex;
   justify-content: space-between;
@@ -277,6 +283,78 @@ const recruiterCss = `
   color: #888888;
 }
 
+.rh-error {
+  margin-top: 0.75rem;
+  padding: 0.6rem 0.75rem;
+  border-radius: 8px;
+  background: rgba(220, 38, 38, 0.12);
+  border: 1px solid rgba(220, 38, 38, 0.35);
+  color: #fca5a5;
+  font-size: 0.875rem;
+}
+
+.rh-ai-summary {
+  margin-top: 1.25rem;
+  padding: 1rem;
+  border-radius: 10px;
+  background: rgba(13, 148, 136, 0.08);
+  border: 1px solid rgba(13, 148, 136, 0.25);
+}
+
+.rh-ai-summary h4 {
+  margin: 0 0 0.5rem;
+  color: #E0E0E0;
+  font-size: 0.9375rem;
+  font-weight: 600;
+}
+
+.rh-ai-summary p {
+  margin: 0;
+  color: #b0b0b0;
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+
+.rh-crop-availability {
+  margin-top: 1.25rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(102, 102, 102, 0.3);
+}
+
+.rh-crop-availability h4 {
+  margin: 0 0 0.5rem;
+  color: #E0E0E0;
+  font-size: 0.9375rem;
+  font-weight: 600;
+}
+
+.rh-prediction-block {
+  display: grid;
+  gap: 1rem;
+}
+
+.rh-prediction-subhead {
+  margin: 0 0 0.25rem;
+  color: #b0b0b0;
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.rh-prediction-summary {
+  margin-top: 0.75rem;
+}
+
+.rh-prediction-summary p {
+  margin: 0.25rem 0;
+  color: #b0b0b0;
+  font-size: 0.9rem;
+}
+
+.rh-cell-company {
+  color: #E0E0E0;
+  font-weight: 500;
+}
+
 @media (max-width: 1024px) {
   .rh-two-col,
   .rh-form-grid {
@@ -321,5 +399,12 @@ export const recruiterHomeStyles = {
   percentage: 'rh-percentage',
   rank: 'rh-rank',
   eta: 'rh-eta',
-  throughput: 'rh-throughput'
+  throughput: 'rh-throughput',
+  error: 'rh-error',
+  aiSummary: 'rh-ai-summary',
+  cropAvailability: 'rh-crop-availability',
+  predictionBlock: 'rh-prediction-block',
+  predictionSubhead: 'rh-prediction-subhead',
+  predictionSummary: 'rh-prediction-summary',
+  cellCompany: 'rh-cell-company'
 };

@@ -70,6 +70,43 @@ function ProfilePage({ user, onUpdateProfile, onBackToHome }: ProfilePageProps) 
               </div>
             </div>
 
+            {user.profile && (
+              <>
+                {user.profile.state_name != null && user.profile.state_name !== '' && (
+                  <div className={styles.field}>
+                    <label className={styles.label}>State</label>
+                    <div className={styles.readonly} aria-readonly>
+                      {user.profile.state_name}
+                    </div>
+                  </div>
+                )}
+                {user.profile.district_name != null && user.profile.district_name !== '' && (
+                  <div className={styles.field}>
+                    <label className={styles.label}>District</label>
+                    <div className={styles.readonly} aria-readonly>
+                      {user.profile.district_name}
+                    </div>
+                  </div>
+                )}
+                {user.profile.designation != null && user.profile.designation !== '' && (
+                  <div className={styles.field}>
+                    <label className={styles.label}>Designation</label>
+                    <div className={styles.readonly} aria-readonly>
+                      {user.profile.designation}
+                    </div>
+                  </div>
+                )}
+                {user.profile.phone != null && user.profile.phone !== '' && (
+                  <div className={styles.field}>
+                    <label className={styles.label}>Phone</label>
+                    <div className={styles.readonly} aria-readonly>
+                      {user.profile.phone}
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
+
             <div className={styles.actions}>
               <button type="submit" className={styles.primaryButton}>
                 Save changes
