@@ -15,10 +15,14 @@ import type {
   HistoryItem,
   ImpactResponse,
   PredictResponse,
+  ProductionData,
+  DemandSupply,
+  CropPrice,
 } from '../types';
 import type { Role } from '../../components/types';
 
-const BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://127.0.0.1:8000';
+// const BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://10.10.27.98:8000';
+const BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://10.10.27.62:8000';
 const ACCESS_TOKEN_KEY = 'tf_access_token';
 const ROLE_KEY = 'tf_role';
 const STORED_USER_KEY = 'tf_stored_user';
@@ -30,12 +34,16 @@ const API_PATHS = {
   states: '/api/v1/states/',
   districts: '/api/v1/districts/',
   crops: '/api/v1/crops/',
+  cropDetail: (id: number) => `/api/v1/crops/${id}/`,
   cropAvailability: '/api/v1/crop-availability/',
   optimize: '/api/v1/optimize/',
-  result: (id: number) => `/api/v1/results/${id}/`,
+  result: (id: string) => `/api/v1/results/${id}/`,
   history: '/api/v1/history/',
   impact: '/api/v1/impact/',
   predict: (cropId: number) => `/api/v1/predict/${cropId}/`,
+  production: '/api/v1/production/',
+  demandSupply: '/api/v1/demand-supply/',
+  prices: '/api/v1/prices/',
 } as const;
 
 export function getAccessToken(): string | null {
@@ -177,7 +185,7 @@ export async function optimize(payload: OptimizePayload): Promise<OptimizeRespon
   return data;
 }
 
-export async function getResult(queryId: number): Promise<ResultDetailResponse> {
+export async function getResult(queryId: string): Promise<ResultDetailResponse> {
   const { data } = await client.get<ResultDetailResponse>(API_PATHS.result(queryId));
   return data;
 }
@@ -196,4 +204,50 @@ export async function getPredict(cropId: number, stateId?: number): Promise<Pred
   const url = stateId != null ? `${API_PATHS.predict(cropId)}?state=${stateId}` : API_PATHS.predict(cropId);
   const { data } = await client.get<PredictResponse>(url);
   return data;
+}
+
+export async function getCropDetail(cropId: number): Promise<CropOption> {
+  const { data } = await client.get<CropOption>(API_PATHS.cropDetail(cropId));
+  return data;
+}
+
+export async function getProduction(
+  cropId?: number,
+  stateId?: number,
+  cropYear?: number,
+  season?: string,
+  page?: number
+): Promise<ProductionData[]> {
+  const params = new URLSearchParams();
+  if (cropId != null) params.set('crop', String(cropId));
+  if (stateId != null) params.set('state', String(stateId));
+  if (cropYear != null) params.set('crop_year', String(cropYear));
+  if (season) params.set('season', season);
+  if (page != null) params.set('page', String(page));
+  const query = params.toString();
+  const url = query ? `${API_PATHS.production}?${query}` : API_PATHS.production;
+  const { data } = await client.get<PaginatedResponse<ProductionData>>(url);
+  return ensureResultsArray<ProductionData>(data);
+}
+
+export async function getDemandSupply(): Promise<DemandSupply[]> {
+  const { data } = await client.get<PaginatedResponse<DemandSupply>>(API_PATHS.demandSupply);
+  return ensureResultsArray<DemandSupply>(data);
+}
+
+export async function getCropPrices(
+  cropId?: number,
+  stateId?: number,
+  year?: number,
+  page?: number
+): Promise<CropPrice[]> {
+  const params = new URLSearchParams();
+  if (cropId != null) params.set('crop', String(cropId));
+  if (stateId != null) params.set('state', String(stateId));
+  if (year != null) params.set('year', String(year));
+  if (page != null) params.set('page', String(page));
+  const query = params.toString();
+  const url = query ? `${API_PATHS.prices}?${query}` : API_PATHS.prices;
+  const { data } = await client.get<PaginatedResponse<CropPrice>>(url);
+  return ensureResultsArray<CropPrice>(data);
 }

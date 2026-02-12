@@ -16,12 +16,20 @@ import {
   getPredict,
   getErrorMessage,
   getStoredUser,
+  getAccessToken,
+  getProduction,
+  getDemandSupply,
+  getCropPrices,
 } from '../api/clientapi';
 import type {
   CropOption,
   OptimizeResponse,
   CropAvailabilityResponse,
   PredictResponse,
+  ProductionData,
+  DemandSupply,
+  CropPrice,
+  AISummary,
 } from '../api/types';
 import {
   mapOptimizeResultsToRecommendations,
@@ -48,6 +56,8 @@ type RecruiterContextValue = {
   setPriceCap: (value: string) => void;
   climateMode: boolean;
   setClimateMode: (value: boolean) => void;
+  transportMode: string;
+  setTransportMode: (value: string) => void;
   weights: WeightConfig;
   setWeights: (value: WeightConfig) => void;
   recommendations: Recommendation[];
@@ -56,7 +66,7 @@ type RecruiterContextValue = {
   impactsLoading: boolean;
   status: ProcessingStatus;
   progress: number;
-  aiSummary: string | null;
+  aiSummary: string | AISummary | null;
   optimizationError: string | null;
   runOptimization: () => Promise<void>;
   loadCrops: () => Promise<void>;
@@ -70,6 +80,15 @@ type RecruiterContextValue = {
   prediction: PredictResponse | null;
   predictionLoading: boolean;
   loadPrediction: (cropId: number | null) => void;
+  productionData: ProductionData[];
+  productionLoading: boolean;
+  loadProduction: (cropId?: number, cropYear?: number, season?: string) => Promise<void>;
+  demandSupply: DemandSupply[];
+  demandSupplyLoading: boolean;
+  loadDemandSupply: () => Promise<void>;
+  cropPrices: CropPrice[];
+  pricesLoading: boolean;
+  loadCropPrices: (cropId?: number, year?: number) => Promise<void>;
 };
 
 const RecruiterContext = createContext<RecruiterContextValue | null>(null);
@@ -84,6 +103,7 @@ export function RecruiterProvider({ children }: { children: React.ReactNode }) {
   const [deliveryWindow, setDeliveryWindow] = useState('3-5 days');
   const [priceCap, setPriceCap] = useState('');
   const [climateMode, setClimateMode] = useState(false);
+  const [transportMode, setTransportMode] = useState('both');
   const [weights, setWeights] = useState<WeightConfig>({
     cost: 50,
     time: 25,
@@ -95,7 +115,7 @@ export function RecruiterProvider({ children }: { children: React.ReactNode }) {
   const [impactsLoading, setImpactsLoading] = useState(false);
   const [status, setStatus] = useState<ProcessingStatus>('idle');
   const [progress, setProgress] = useState(0);
-  const [aiSummary, setAiSummary] = useState<string | null>(null);
+  const [aiSummary, setAiSummary] = useState<string | AISummary | null>(null);
   const [optimizationError, setOptimizationError] = useState<string | null>(null);
   const [cropAvailability, setCropAvailability] = useState<CropAvailabilityResponse | null>(null);
   const [cropAvailabilityLoading, setCropAvailabilityLoading] = useState(false);
@@ -103,6 +123,12 @@ export function RecruiterProvider({ children }: { children: React.ReactNode }) {
   const [historyLoading, setHistoryLoading] = useState(false);
   const [prediction, setPrediction] = useState<PredictResponse | null>(null);
   const [predictionLoading, setPredictionLoading] = useState(false);
+  const [productionData, setProductionData] = useState<ProductionData[]>([]);
+  const [productionLoading, setProductionLoading] = useState(false);
+  const [demandSupply, setDemandSupply] = useState<DemandSupply[]>([]);
+  const [demandSupplyLoading, setDemandSupplyLoading] = useState(false);
+  const [cropPrices, setCropPrices] = useState<CropPrice[]>([]);
+  const [pricesLoading, setPricesLoading] = useState(false);
 
   const progressPercent = useMemo(
     () => (status === 'running' || status === 'done' ? Math.min(100, progress) : 0),
@@ -173,6 +199,46 @@ export function RecruiterProvider({ children }: { children: React.ReactNode }) {
       .finally(() => setPredictionLoading(false));
   }, []);
 
+  const loadProduction = useCallback(async (cropId?: number, cropYear?: number, season?: string) => {
+    setProductionLoading(true);
+    try {
+      const stored = getStoredUser();
+      const stateId = stored?.profile?.state;
+      const list = await getProduction(cropId, stateId, cropYear, season);
+      setProductionData(list);
+    } catch {
+      setProductionData([]);
+    } finally {
+      setProductionLoading(false);
+    }
+  }, []);
+
+  const loadDemandSupply = useCallback(async () => {
+    setDemandSupplyLoading(true);
+    try {
+      const list = await getDemandSupply();
+      setDemandSupply(list);
+    } catch {
+      setDemandSupply([]);
+    } finally {
+      setDemandSupplyLoading(false);
+    }
+  }, []);
+
+  const loadCropPrices = useCallback(async (cropId?: number, year?: number) => {
+    setPricesLoading(true);
+    try {
+      const stored = getStoredUser();
+      const stateId = stored?.profile?.state;
+      const list = await getCropPrices(cropId, stateId, year);
+      setCropPrices(list);
+    } catch {
+      setCropPrices([]);
+    } finally {
+      setPricesLoading(false);
+    }
+  }, []);
+
   const runOptimization = useCallback(async () => {
     const stored = getStoredUser();
     const stateId = stored?.profile?.state;
@@ -201,13 +267,14 @@ export function RecruiterProvider({ children }: { children: React.ReactNode }) {
         state_id: stateId,
         district_id: districtId,
         quantity_tonnes: quantity,
+        transport_mode: transportMode,
       });
       setProgress(70);
 
       const mapped = mapOptimizeResultsToRecommendations(response.results, response.crop_name);
       setRecommendations(mapped);
 
-      let summary: string | null = null;
+      let summary: string | AISummary | null = null;
       try {
         const detail = await getResult(response.id);
         summary = detail.ai_summary ?? null;
@@ -228,19 +295,31 @@ export function RecruiterProvider({ children }: { children: React.ReactNode }) {
   }, [cropId, quantity, loadHistory]);
 
   useEffect(() => {
+    // Only load crops if user is authenticated
+    const token = getAccessToken();
+    if (!token) return;
     loadCrops();
   }, [loadCrops]);
 
   useEffect(() => {
+    // Only load impact and history if user is authenticated
+    const token = getAccessToken();
+    if (!token) return;
     loadImpact();
     loadHistory();
   }, [loadImpact, loadHistory]);
 
   useEffect(() => {
+    // Only load crop availability if user is authenticated
+    const token = getAccessToken();
+    if (!token) return;
     loadCropAvailability(cropId);
   }, [cropId, loadCropAvailability]);
 
   useEffect(() => {
+    // Only load prediction if user is authenticated
+    const token = getAccessToken();
+    if (!token) return;
     loadPrediction(cropId);
   }, [cropId, loadPrediction]);
 
@@ -259,6 +338,8 @@ export function RecruiterProvider({ children }: { children: React.ReactNode }) {
     setPriceCap,
     climateMode,
     setClimateMode,
+    transportMode,
+    setTransportMode,
     weights,
     setWeights,
     recommendations,
@@ -281,6 +362,15 @@ export function RecruiterProvider({ children }: { children: React.ReactNode }) {
     prediction,
     predictionLoading,
     loadPrediction,
+    productionData,
+    productionLoading,
+    loadProduction,
+    demandSupply,
+    demandSupplyLoading,
+    loadDemandSupply,
+    cropPrices,
+    pricesLoading,
+    loadCropPrices,
   };
 
   return (

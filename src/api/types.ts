@@ -15,6 +15,7 @@ export type RegisterResponse = {
   token: string;
   user_id: number;
   username: string;
+  profile?: LoginProfile;
 };
 
 /** Login request body (POST /api/v1/auth/login/) */
@@ -102,6 +103,7 @@ export type OptimizePayload = {
   state_id: number;
   district_id: number;
   quantity_tonnes: number;
+  transport_mode?: string;
 };
 
 /** Single result item from optimize/result */
@@ -121,7 +123,7 @@ export type OptimizeResultItem = {
 
 /** Optimize success response (201) */
 export type OptimizeResponse = {
-  id: number;
+  id: string;
   crop_name: string;
   state_name: string;
   district_name: string;
@@ -130,9 +132,17 @@ export type OptimizeResponse = {
   results: OptimizeResultItem[];
 };
 
+/** AI Summary structure */
+export type AISummary = {
+  headline: string;
+  points: string[];
+  generated_at?: string;
+  model?: string;
+};
+
 /** Result detail with AI summary (GET /api/v1/results/{id}/) */
 export type ResultDetailResponse = OptimizeResponse & {
-  ai_summary: string | null;
+  ai_summary: string | AISummary | null;
 };
 
 /** History item (GET /api/v1/history/) */
@@ -154,12 +164,21 @@ export type HistoricalDataPoint = {
   area: number;
 };
 
+/** Forecast data point */
+export type ForecastPoint = {
+  year: number;
+  predicted_demand_tonnes: number;
+  confidence: number;
+  suggestion: string;
+};
+
 /** Prediction part of predict response */
 export type PredictionData = {
-  prediction_year_1?: number;
-  prediction_year_2?: number;
-  confidence?: string;
-  reasoning?: string;
+  current_year: number;
+  trend: string;
+  confidence: number;
+  analysis: string;
+  forecast: ForecastPoint[];
   error?: string;
 };
 
@@ -169,4 +188,40 @@ export type PredictResponse = {
   state?: string;
   historical_data: HistoricalDataPoint[];
   prediction: PredictionData;
+};
+
+/** Production data (GET /api/v1/production/) */
+export type ProductionData = {
+  id: number;
+  state_name: string;
+  district_name: string;
+  crop_name: string;
+  crop_year: number;
+  season: string;
+  area: number; // hectares
+  production: number; // tonnes
+};
+
+/** Demand & Supply projection (GET /api/v1/demand-supply/) */
+export type DemandSupply = {
+  id: number;
+  crop_group: string;
+  projected_demand_2016_17: number; // million tonnes
+  projected_demand_2020_21: number; // million tonnes
+  projected_supply_2016_17_low: number; // million tonnes
+  projected_supply_2016_17_high: number; // million tonnes
+  actual_production_2006_07: number; // million tonnes
+  actual_production_2011_12: number; // million tonnes
+};
+
+/** Crop price (GET /api/v1/prices/) */
+export type CropPrice = {
+  id: number;
+  crop: number;
+  crop_name: string;
+  state: number;
+  state_name: string;
+  price_per_tonne: string;
+  year: number;
+  source: string;
 };

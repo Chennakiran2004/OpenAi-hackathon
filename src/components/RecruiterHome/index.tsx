@@ -3,6 +3,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useRecruiter } from '../../contexts/RecruiterContext';
 import { WeightConfig } from '../types';
 import { recruiterHomeStyles as styles } from './stylecomponent';
+import SearchableSelect from '../ui/SearchableSelect';
 
 function RecruiterHome() {
   const { user } = useAuth();
@@ -18,6 +19,8 @@ function RecruiterHome() {
     setUrgency,
     deliveryWindow,
     setDeliveryWindow,
+    transportMode,
+    setTransportMode,
     priceCap,
     setPriceCap,
     climateMode,
@@ -49,11 +52,6 @@ function RecruiterHome() {
     setWeights({ ...weights, [key]: value });
   };
 
-  const handleCropChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const raw = e.target.value;
-    setCropId(raw === '' ? null : Number(raw));
-  };
-
   return (
     <section className={styles.section}>
       <div className={styles.inner}>
@@ -69,22 +67,17 @@ function RecruiterHome() {
           <article className={styles.panel}>
             <h3>Demand & Constraints</h3>
             <div className={styles.formGrid}>
-              <label className={styles.label}>
-                Crop
-                <select
-                  className={styles.input}
+              <div className={styles.label}>
+                <SearchableSelect
+                  label="Crop"
+                  required
                   value={cropId ?? ''}
-                  onChange={handleCropChange}
+                  onChange={(value) => setCropId(value === '' ? null : Number(value))}
+                  options={cropOptions.map(c => ({ value: c.id, label: c.name }))}
+                  placeholder={cropOptionsLoading ? 'Loading crops...' : 'Select crop'}
                   disabled={cropOptionsLoading}
-                >
-                  <option value="">{cropOptionsLoading ? 'Loading…' : 'Select crop'}</option>
-                  {cropOptions.map((c) => (
-                    <option key={c.id} value={c.id}>
-                      {c.name}
-                    </option>
-                  ))}
-                </select>
-              </label>
+                />
+              </div>
               <label className={styles.label}>
                 Quantity (tonnes)
                 <input
@@ -117,6 +110,18 @@ function RecruiterHome() {
                   <option>3-5 days</option>
                   <option>1-2 days</option>
                   <option>Same day</option>
+                </select>
+              </label>
+              <label className={styles.label}>
+                Transport Mode
+                <select
+                  className={styles.input}
+                  value={transportMode}
+                  onChange={(e) => setTransportMode(e.target.value)}
+                >
+                  <option value="both">Both (Road + Rail)</option>
+                  <option value="road">Road Only</option>
+                  <option value="rail">Rail Only</option>
                 </select>
               </label>
               <label className={styles.label}>
@@ -161,8 +166,8 @@ function RecruiterHome() {
                           {cropAvailability.states.slice(0, 10).map((s) => (
                             <tr key={s.state__id}>
                               <td className={styles.cellCompany}>{s.state__name}</td>
-                              <td>{s.total_production.toLocaleString()}</td>
-                              <td>{s.total_area.toLocaleString()}</td>
+                              <td>{(s.total_production ?? 0).toLocaleString()}</td>
+                              <td>{(s.total_area ?? 0).toLocaleString()}</td>
                               <td>{s.district_count}</td>
                             </tr>
                           ))}
@@ -290,7 +295,20 @@ function RecruiterHome() {
           {aiSummary && (
             <div className={styles.aiSummary}>
               <h4>AI Recommendation</h4>
-              <p>{aiSummary}</p>
+              {typeof aiSummary === 'string' ? (
+                <p>{aiSummary}</p>
+              ) : (
+                <>
+                  {aiSummary.headline && <p><strong>{aiSummary.headline}</strong></p>}
+                  {aiSummary.points && Array.isArray(aiSummary.points) && (
+                    <ul>
+                      {aiSummary.points.map((point: string, index: number) => (
+                        <li key={index}>{point}</li>
+                      ))}
+                    </ul>
+                  )}
+                </>
+              )}
             </div>
           )}
         </article>
@@ -390,8 +408,8 @@ function RecruiterHome() {
                                 .map((d) => (
                                   <tr key={d.year}>
                                     <td>{d.year}</td>
-                                    <td>{d.production.toLocaleString()}</td>
-                                    <td>{d.area.toLocaleString()}</td>
+                                    <td>{(d.production ?? 0).toLocaleString()}</td>
+                                    <td>{(d.area ?? 0).toLocaleString()}</td>
                                   </tr>
                                 ))}
                             </tbody>
@@ -399,7 +417,7 @@ function RecruiterHome() {
                         </div>
                       </div>
                     )}
-                    <div className={styles.predictionSummary}>
+                    {/* <div className={styles.predictionSummary}>
                       {prediction.prediction.prediction_year_1 != null && (
                         <p>Prediction year 1: {prediction.prediction.prediction_year_1.toLocaleString()} t</p>
                       )}
@@ -412,7 +430,7 @@ function RecruiterHome() {
                       {prediction.prediction.reasoning && (
                         <p className={styles.smallText}>{prediction.prediction.reasoning}</p>
                       )}
-                    </div>
+                    </div> */}
                   </>
                 )}
               </div>

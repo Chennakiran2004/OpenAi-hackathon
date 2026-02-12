@@ -1,4 +1,4 @@
-import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
+﻿import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import {
   clearAccessToken,
@@ -22,11 +22,11 @@ function storedUserToUser(stored: StoredUser, role: Role): User {
   const email = stored.profile?.phone ?? "";
   const profile = stored.profile
     ? {
-        state_name: stored.profile.state_name,
-        district_name: stored.profile.district_name,
-        designation: stored.profile.designation,
-        phone: stored.profile.phone,
-      }
+      state_name: stored.profile.state_name,
+      district_name: stored.profile.district_name,
+      designation: stored.profile.designation,
+      phone: stored.profile.phone,
+    }
     : undefined;
   return { name, email, role, profile };
 }
@@ -34,6 +34,8 @@ function storedUserToUser(stored: StoredUser, role: Role): User {
 type AuthContextValue = {
   user: User | null;
   setUser: React.Dispatch<React.SetStateAction<User | null>>;
+  sessionRestored: boolean;
+  setSessionRestored: React.Dispatch<React.SetStateAction<boolean>>;
   authMode: AuthMode;
   setAuthMode: React.Dispatch<React.SetStateAction<AuthMode>>;
   roleChoice: Role;
@@ -74,6 +76,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [searchParams] = useSearchParams();
 
   const [user, setUser] = useState<User | null>(null);
+  const [sessionRestored, setSessionRestored] = useState(false);
   const [authMode, setAuthMode] = useState<AuthMode>("signin");
   const [roleChoice, setRoleChoice] = useState<Role>("state_officer");
   const [username, setUsername] = useState("");
@@ -173,22 +176,60 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setAuthError("Passwords do not match.");
           return;
         }
+
+        // Validate required fields
+        const trimmedEmail = email.trim();
+        if (!trimmedEmail) {
+          setAuthError("Email is required.");
+          return;
+        }
+
+        if (stateId === "") {
+          setAuthError("Please select a state.");
+          return;
+        }
+
+        if (districtId === "") {
+          setAuthError("Please select a district.");
+          return;
+        }
+
         const payload: RegisterPayload = {
           username: trimmedUsername,
           password: trimmedPassword,
-          email: email.trim() || undefined,
+          email: trimmedEmail,
           first_name: firstName.trim() || undefined,
           last_name: lastName.trim() || undefined,
-          state_id: stateId === "" ? undefined : Number(stateId),
-          district_id: districtId === "" ? undefined : Number(districtId),
+          state_id: Number(stateId),
+          district_id: Number(districtId),
           designation: designation.trim() || undefined,
         };
         try {
           const data = await apiRegister(payload);
           setAccessToken(data.token);
           setStoredRole(roleChoice);
-          setStoredUser({ user_id: data.user_id, username: data.username });
-          setUser(storedUserToUser({ user_id: data.user_id, username: data.username }, roleChoice));
+
+          // Construct profile data from registration payload
+          const selectedState = stateOptions.find(s => s.id === Number(stateId));
+          const selectedDistrict = districtOptions.find(d => d.id === Number(districtId));
+
+          const profileData = {
+            state: Number(stateId),
+            state_name: selectedState?.name,
+            district: Number(districtId),
+            district_name: selectedDistrict?.name,
+            designation: designation.trim() || undefined,
+            phone: trimmedEmail, // Use email as phone for now
+          };
+
+          const storedUser = {
+            user_id: data.user_id,
+            username: data.username,
+            profile: data.profile || profileData, // Use backend profile or constructed one
+          };
+
+          setStoredUser(storedUser);
+          setUser(storedUserToUser(storedUser, roleChoice));
           navigate("/home");
         } catch (err) {
           setAuthError(getErrorMessage(err));
@@ -212,7 +253,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   );
 
   const logout = useCallback(() => {
-    apiLogout().catch(() => {});
+    apiLogout().catch(() => { });
     clearAccessToken();
     setUser(null);
     setUsername("");
@@ -237,6 +278,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const value: AuthContextValue = {
     user,
     setUser,
+    sessionRestored,
+    setSessionRestored,
     authMode,
     setAuthMode,
     roleChoice,
@@ -279,3 +322,4 @@ export function useAuth(): AuthContextValue {
 }
 
 export { storedUserToUser };
+

@@ -4,17 +4,25 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        trust: {
-          50: '#eef2ff',
-          100: '#e0e7ff',
-          500: '#3f4b96',
-          700: '#26346d',
-          900: '#142045'
+        brand: {
+          primary: '#1F7A4D',      // Primary Brand Green
+          accent: '#2BB673',       // Accent Green
+          highlight: '#22C55E',    // Highlight (Carbon Badge)
+          warning: '#F59E0B',      // Warning/Time Accent
+          dark: '#0F172A',         // Dark Background
+          light: '#F5F7FA',        // Light Background
         },
-        fairness: {
-          100: '#dff7f1',
-          500: '#10957d',
-          700: '#0d705f'
+        primary: {
+          50: '#f0fdf7',
+          100: '#dcfcec',
+          200: '#bbf7d9',
+          300: '#86efbd',
+          400: '#4ade99',
+          500: '#2BB673',
+          600: '#1F7A4D',
+          700: '#166239',
+          800: '#144e2e',
+          900: '#124027',
         }
       },
       fontFamily: {
@@ -22,7 +30,7 @@ module.exports = {
       },
       boxShadow: {
         soft: '0 10px 30px rgba(15, 23, 42, 0.08)',
-        card: '0 14px 34px rgba(20, 32, 69, 0.12)'
+        card: '0 14px 34px rgba(15, 23, 42, 0.12)'
       }
     }
   },

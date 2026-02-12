@@ -6,54 +6,79 @@ import { RecruiterProvider } from "./contexts/RecruiterContext";
 import AuthPage from "./components/AuthPage";
 import LandingPage from "./components/LandingPage";
 import ProfilePage from "./components/ProfilePage";
-import RecruiterHome from "./components/RecruiterHome";
-import StudentHome from "./components/StudentHome";
-import HomeNavbar from "./components/HomeNavbar";
+import Dashboard from "./components/Dashboard";
+import OptimizeForm from "./components/OptimizeForm";
+import OptimizationResults from "./components/OptimizationResults";
+import QueryHistory from "./components/QueryHistory";
+import ImpactDashboard from "./components/ImpactDashboard";
+import DemandPrediction from "./components/DemandPrediction";
 import TopBar from "./components/TopBar";
 import { appStyles as styles } from "./stylecomponent";
 
+
 function SessionRestore() {
   const navigate = useNavigate();
-  const { setUser } = useAuth();
+  const location = useLocation();
+  const { setUser, setSessionRestored } = useAuth();
+
   useEffect(() => {
     const token = getAccessToken();
-    if (!token) return;
+    if (!token) {
+      setSessionRestored(true);
+      return;
+    }
     const stored = getStoredUser();
     if (!stored) {
       clearAccessToken();
+      setSessionRestored(true);
       return;
     }
     const role = getStoredRole() || "state_officer";
     setUser(storedUserToUser(stored, role));
-    navigate("/home", { replace: true });
-  }, [navigate, setUser]);
+    setSessionRestored(true);
+
+    // Only redirect to /dashboard if user is on a public page (e.g., / or /auth)
+    // Don't redirect if they're already on a protected route like /profile or /dashboard
+    const isPublicPage = location.pathname === "/" || location.pathname === "/auth";
+    if (isPublicPage) {
+      navigate("/dashboard", { replace: true });
+    }
+  }, [navigate, setUser, setSessionRestored, location.pathname]);
   return null;
 }
 
 function AppContent() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { user, setUser, logout } = useAuth();
-  const showHomeNav = location.pathname === "/home" || location.pathname === "/profile";
+  const { user, setUser, logout, sessionRestored } = useAuth();
+
+  // Only show TopBar on public pages (landing and auth)
+  const showTopBar = location.pathname === "/" || location.pathname === "/auth";
+
+  // Show loading while session is being restored
+  if (!sessionRestored) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>
-      {showHomeNav ? (
-        <HomeNavbar
-          onBrandClick={() => navigate("/home")}
-          onProfileClick={() => navigate("/profile")}
-          onLogout={logout}
-        />
-      ) : (
+      {showTopBar && (
         <TopBar
           isLoggedIn={Boolean(user)}
-          onBrandClick={() => navigate(user ? "/home" : "/")}
+          onBrandClick={() => navigate(user ? "/dashboard" : "/")}
           onSignIn={() => navigate("/auth")}
           onSignUp={() => navigate("/auth?mode=signup")}
           onLogout={logout}
         />
       )}
-      <main className={`${styles.container} ${styles.main}`}>
+      <main className={showTopBar ? `${styles.container} ${styles.main}` : ''}>
         <Routes>
           <Route
             path="/"
@@ -67,14 +92,62 @@ function AppContent() {
           />
           <Route path="/auth" element={<AuthPage />} />
           <Route
-            path="/home"
+            path="/dashboard"
             element={
               !user ? (
                 <Navigate to="/" replace />
-              ) : user.role === "central_admin" ? (
-                <StudentHome />
               ) : (
-                <RecruiterHome />
+                <Dashboard />
+              )
+            }
+          />
+          <Route
+            path="/optimize"
+            element={
+              !user ? (
+                <Navigate to="/" replace />
+              ) : (
+                <OptimizeForm />
+              )
+            }
+          />
+          <Route
+            path="/results/:id"
+            element={
+              !user ? (
+                <Navigate to="/" replace />
+              ) : (
+                <OptimizationResults />
+              )
+            }
+          />
+          <Route
+            path="/history"
+            element={
+              !user ? (
+                <Navigate to="/" replace />
+              ) : (
+                <QueryHistory />
+              )
+            }
+          />
+          <Route
+            path="/predict"
+            element={
+              !user ? (
+                <Navigate to="/" replace />
+              ) : (
+                <DemandPrediction />
+              )
+            }
+          />
+          <Route
+            path="/impact"
+            element={
+              !user ? (
+                <Navigate to="/" replace />
+              ) : (
+                <ImpactDashboard />
               )
             }
           />
@@ -89,7 +162,7 @@ function AppContent() {
                   onUpdateProfile={({ name: newName, email: newEmail }) =>
                     setUser((u) => (u ? { ...u, name: newName, email: newEmail } : null))
                   }
-                  onBackToHome={() => navigate("/home")}
+                  onBackToHome={() => navigate("/dashboard")}
                 />
               )
             }
