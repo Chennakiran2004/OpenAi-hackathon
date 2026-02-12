@@ -1,5 +1,5 @@
-import React from 'react';
-import { topBarStyles as styles } from './stylecomponent';
+import React from "react";
+import { topBarStyles as styles } from "./stylecomponent";
 
 type TopBarProps = {
   isLoggedIn: boolean;
@@ -9,31 +9,53 @@ type TopBarProps = {
   onLogout: () => void;
 };
 
-function TopBar({ isLoggedIn, onBrandClick, onSignIn, onSignUp, onLogout }: TopBarProps) {
+function TopBar({
+  isLoggedIn,
+  onBrandClick,
+  onSignIn,
+  onSignUp,
+  onLogout,
+}: TopBarProps) {
   return (
-    <header className={styles.header}>
-      <div className={styles.navbar}>
-        <button type="button" className={styles.brandButton} onClick={onBrandClick}>
-          <span className={styles.brand}>Bharat Krishi Setu (BKS)</span>
+    <header className={styles.header} style={{ backgroundColor: "#F5F7FA" }}>
+      <nav className={styles.navbar} aria-label="Primary">
+        <button
+          type="button"
+          className={styles.brandButton}
+          onClick={onBrandClick}
+        >
+          <span className={styles.brand}>Bharat Krishi Setu</span>
         </button>
         <div className={styles.actions}>
           {!isLoggedIn && (
             <>
-              <button className={styles.secondaryButton} type="button" onClick={onSignIn}>
+              <button
+                className={styles.secondaryButton}
+                type="button"
+                onClick={onSignIn}
+              >
                 View Sandbox
               </button>
-              <button className={styles.primaryButton} type="button" onClick={onSignUp}>
+              <button
+                className={styles.primaryButton}
+                type="button"
+                onClick={onSignUp}
+              >
                 Request Demo
               </button>
             </>
           )}
           {isLoggedIn && (
-            <button className={styles.secondaryButton} type="button" onClick={onLogout}>
+            <button
+              className={styles.secondaryButton}
+              type="button"
+              onClick={onLogout}
+            >
               Logout
             </button>
           )}
         </div>
-      </div>
+      </nav>
     </header>
   );
 }

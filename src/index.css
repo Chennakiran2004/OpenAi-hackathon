@@ -252,7 +252,7 @@ input, select, textarea {
   background: linear-gradient(
     90deg,
     var(--color-gray-200) 0%,
-    var(--color-gray-100) 50%,
+    var(--color-gray-300) 50%,
     var(--color-gray-200) 100%
   );
   background-size: 200% 100%;

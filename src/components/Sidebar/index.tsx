@@ -1,116 +1,156 @@
-import React from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import React from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import {
-    HiChartBar,
-    HiSearch,
-    HiClipboardList,
-    HiTrendingUp,
-    HiGlobeAlt,
-    HiUser,
-    HiLogout
-} from 'react-icons/hi';
-import { RiSeedlingFill } from 'react-icons/ri';
+  HiChartBar,
+  HiSearch,
+  HiClipboardList,
+  HiTrendingUp,
+  HiGlobeAlt,
+  HiSwitchHorizontal,
+  HiUser,
+  HiLogout,
+} from "react-icons/hi";
+import { RiSeedlingFill } from "react-icons/ri";
 
 interface SidebarProps {
-    onLogout: () => void;
+  onLogout: () => void;
 }
 
 export default function Sidebar({ onLogout }: SidebarProps) {
-    const navigate = useNavigate();
-    const location = useLocation();
+  const navigate = useNavigate();
+  const location = useLocation();
 
-    const menuItems = [
-        { path: '/dashboard', label: 'Dashboard', icon: <HiChartBar className="w-5 h-5" /> },
-        { path: '/optimize', label: 'Optimize', icon: <HiSearch className="w-5 h-5" /> },
-        { path: '/history', label: 'History', icon: <HiClipboardList className="w-5 h-5" /> },
-        { path: '/predict', label: 'Predict', icon: <HiTrendingUp className="w-5 h-5" /> },
-        { path: '/impact', label: 'Impact', icon: <HiGlobeAlt className="w-5 h-5" /> },
-    ];
+  const menuItems = [
+    {
+      path: "/dashboard",
+      label: "Dashboard",
+      icon: <HiChartBar className="w-5 h-5" />,
+    },
+    {
+      path: "/optimize",
+      label: "Smart Sourcing",
+      icon: <HiSearch className="w-5 h-5" />,
+    },
+    {
+      path: "/history",
+      label: "History",
+      icon: <HiClipboardList className="w-5 h-5" />,
+    },
+    {
+      path: "/predict",
+      label: "Predict",
+      icon: <HiTrendingUp className="w-5 h-5" />,
+    },
+    {
+      path: "/impact",
+      label: "Impact",
+      icon: <HiGlobeAlt className="w-5 h-5" />,
+    },
+  ];
 
-    const isActive = (path: string) => location.pathname === path;
+  const isActive = (path: string) => {
+    return location.pathname === path;
+  };
 
-    return (
-        <div className="w-64 bg-white/80 backdrop-blur-md border-r border-gray-200 h-screen fixed left-0 top-0 flex flex-col shadow-sm">
+  return (
+    <div className="w-64 bg-white/80 backdrop-blur-md border-r border-gray-200 h-screen fixed left-0 top-0 flex flex-col shadow-sm">
+      {/* Brand */}
+      <div className="p-6 border-b border-gray-100">
+        <button
+          onClick={() => navigate("/dashboard")}
+          className="flex items-start gap-3 group"
+        >
+          <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-green-100 text-green-700 text-xl shadow-sm group-hover:scale-105 transition">
+            <RiSeedlingFill className="w-6 h-6" />
+          </div>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "flex-start",
+              flexDirection: "column",
+            }}
+          >
+            <h1
+              className="text-lg font-semibold text-gray-800"
+              style={{ textAlign: "justify" }}
+            >
+              BKS
+            </h1>
+            <p className="text-xs text-gray-500">Bharat Krishi Setu</p>
+          </div>
+        </button>
+      </div>
 
-            {/* Brand */}
-            <div className="p-6 border-b border-gray-100">
-                <button
-                    onClick={() => navigate('/dashboard')}
-                    className="flex items-start gap-3 group"
-                >
-                    <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-green-100 text-green-700 text-xl shadow-sm group-hover:scale-105 transition">
-                        <RiSeedlingFill className="w-6 h-6" />
-                    </div>
-                    <div>
-                        <h1 className="text-lg font-semibold text-gray-800">BKS</h1>
-                        <p className="text-xs text-gray-500">Bharat Krishi Setu</p>
-                    </div>
-                </button>
-            </div>
+      {/* Navigation */}
+      <div className="flex-1 p-4 space-y-2">
+        {menuItems.map((item) => {
+          const active = isActive(item.path);
 
-            {/* Navigation */}
-            <div className="flex-1 p-4 space-y-2">
-
-                {menuItems.map((item) => {
-                    const active = isActive(item.path);
-
-                    return (
-                        <button
-                            key={item.path}
-                            onClick={() => navigate(item.path)}
-                            className={`
+          return (
+            <button
+              key={item.path}
+              onClick={() => navigate(item.path)}
+              className={`
                         w-full flex items-center gap-3 px-4 py-3 rounded-xl
                         text-sm font-medium transition-all duration-200
                         group
-                        ${active
-                                    ? 'bg-green-100 text-green-700 shadow-sm'
-                                    : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
-                                }
+                        ${
+                          active
+                            ? "bg-green-100 text-green-700 shadow-sm"
+                            : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                        }
                     `}
-                        >
-                            <div className={`
+            >
+              <div
+                className={`
                         w-9 h-9 flex items-center justify-center rounded-lg
                         transition-all
-                        ${active
-                                    ? 'bg-green-200 text-green-800'
-                                    : 'bg-gray-100 text-gray-500 group-hover:bg-green-50 group-hover:text-green-600'
-                                }
-                    `}>
-                                {item.icon}
-                            </div>
+                        ${
+                          active
+                            ? "bg-green-200 text-green-800"
+                            : "bg-gray-100 text-gray-500 group-hover:bg-green-50 group-hover:text-green-600"
+                        }
+                    `}
+              >
+                {item.icon}
+              </div>
 
-                            <span className="tracking-wide">
-                                {item.label}
-                            </span>
-                        </button>
-                    );
-                })}
+              <span className="tracking-wide">{item.label}</span>
+            </button>
+          );
+        })}
+      </div>
 
-            </div>
-
-            {/* Profile & Logout */}
-            <div className="p-4 border-t border-gray-100 space-y-2">
-                <button
-                    onClick={() => navigate('/profile')}
-                    className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-100 transition-all duration-200 group"
-                >
-                    <div className="w-9 h-9 flex items-center justify-center rounded-lg bg-gray-100 text-gray-600 group-hover:bg-brand-primary group-hover:text-white transition">
-                        <HiUser className="w-5 h-5" />
-                    </div>
-                    <span>Profile</span>
-                </button>
-                <button
-                    onClick={onLogout}
-                    className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-red-600 hover:bg-red-50 transition-all duration-200 group"
-                >
-                    <div className="w-9 h-9 flex items-center justify-center rounded-lg bg-red-100 text-red-600 group-hover:bg-red-200 transition">
-                        <HiLogout className="w-5 h-5" />
-                    </div>
-                    <span>Logout</span>
-                </button>
-            </div>
-
-        </div>
-
-    );
+      {/* Profile & Logout */}
+      <div className="p-4 border-t border-gray-100 space-y-2">
+        <button
+          onClick={() => navigate("/profile")}
+          className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-100 transition-all duration-200 group"
+        >
+          <div className="w-9 h-9 flex items-center justify-center rounded-lg bg-gray-100 text-gray-600 group-hover:bg-brand-primary group-hover:text-white transition">
+            <HiUser className="w-5 h-5" />
+          </div>
+          <span>Profile</span>
+        </button>
+        <button
+          onClick={() => navigate("/choose-sector")}
+          className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-brand-primary hover:bg-green-50 transition-all duration-200 group"
+        >
+          <div className="w-9 h-9 flex items-center justify-center rounded-lg bg-green-100 text-green-700 group-hover:bg-green-200 transition">
+            <HiSwitchHorizontal className="w-5 h-5" />
+          </div>
+          <span>Switch Sector</span>
+        </button>
+        <button
+          onClick={onLogout}
+          className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-red-600 hover:bg-red-50 transition-all duration-200 group"
+        >
+          <div className="w-9 h-9 flex items-center justify-center rounded-lg bg-red-100 text-red-600 group-hover:bg-red-200 transition">
+            <HiLogout className="w-5 h-5" />
+          </div>
+          <span>Logout</span>
+        </button>
+      </div>
+    </div>
+  );
 }

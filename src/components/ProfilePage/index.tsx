@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { User } from '../types';
-import Sidebar from '../Sidebar';
-import { useAuth } from '../../contexts/AuthContext';
-import { profilePageStyles as styles } from './stylecomponent';
+import React, { useState, useEffect } from "react";
+import { User } from "../types";
+import Sidebar from "../Sidebar";
+import { useAuth } from "../../contexts/AuthContext";
+import { profilePageStyles as styles } from "./stylecomponent";
 
 type ProfilePageProps = {
   user: User;
@@ -10,11 +10,15 @@ type ProfilePageProps = {
   onBackToHome: () => void;
 };
 
-function ProfilePage({ user, onUpdateProfile, onBackToHome }: ProfilePageProps) {
+function ProfilePage({
+  user,
+  onUpdateProfile,
+  onBackToHome,
+}: ProfilePageProps) {
   const { logout } = useAuth();
   const [name, setName] = useState(user.name);
   const [email, setEmail] = useState(user.email);
-  console.log("user", user);
+
   useEffect(() => {
     setName(user.name);
     setEmail(user.email);
@@ -22,7 +26,10 @@ function ProfilePage({ user, onUpdateProfile, onBackToHome }: ProfilePageProps) 
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onUpdateProfile({ name: name.trim() || user.name, email: email.trim() || user.email });
+    onUpdateProfile({
+      name: name.trim() || user.name,
+      email: email.trim() || user.email,
+    });
     onBackToHome();
   };
 
@@ -78,49 +85,53 @@ function ProfilePage({ user, onUpdateProfile, onBackToHome }: ProfilePageProps) 
 
                 {user.profile && (
                   <>
-                    {user.profile.state_name != null && user.profile.state_name !== '' && (
-                      <div className={styles.field}>
-                        <label className={styles.label}>State</label>
-                        <div className={styles.readonly} aria-readonly>
-                          {user.profile.state_name}
+                    {user.profile.state_name != null &&
+                      user.profile.state_name !== "" && (
+                        <div className={styles.field}>
+                          <label className={styles.label}>State</label>
+                          <div className={styles.readonly} aria-readonly>
+                            {user.profile.state_name}
+                          </div>
                         </div>
-                      </div>
-                    )}
-                    {user.profile.district_name != null && user.profile.district_name !== '' && (
-                      <div className={styles.field}>
-                        <label className={styles.label}>District</label>
-                        <div className={styles.readonly} aria-readonly>
-                          {user.profile.district_name}
+                      )}
+                    {user.profile.district_name != null &&
+                      user.profile.district_name !== "" && (
+                        <div className={styles.field}>
+                          <label className={styles.label}>District</label>
+                          <div className={styles.readonly} aria-readonly>
+                            {user.profile.district_name}
+                          </div>
                         </div>
-                      </div>
-                    )}
-                    {user.profile.designation != null && user.profile.designation !== '' && (
-                      <div className={styles.field}>
-                        <label className={styles.label}>Designation</label>
-                        <div className={styles.readonly} aria-readonly>
-                          {user.profile.designation}
+                      )}
+                    {user.profile.designation != null &&
+                      user.profile.designation !== "" && (
+                        <div className={styles.field}>
+                          <label className={styles.label}>Designation</label>
+                          <div className={styles.readonly} aria-readonly>
+                            {user.profile.designation}
+                          </div>
                         </div>
-                      </div>
-                    )}
-                    {user.profile.phone != null && user.profile.phone !== '' && (
-                      <div className={styles.field}>
-                        <label className={styles.label}>Phone</label>
-                        <div className={styles.readonly} aria-readonly>
-                          {user.profile.phone}
+                      )}
+                    {user.profile.phone != null &&
+                      user.profile.phone !== "" && (
+                        <div className={styles.field}>
+                          <label className={styles.label}>Phone</label>
+                          <div className={styles.readonly} aria-readonly>
+                            {user.profile.phone}
+                          </div>
                         </div>
-                      </div>
-                    )}
+                      )}
                   </>
                 )}
 
-                <div className={styles.actions}>
+                {/* <div className={styles.actions}>
                   <button type="submit" className={styles.primaryButton}>
                     Save changes
                   </button>
                   <button type="button" className={styles.secondaryButton} onClick={onBackToHome}>
                     Back to dashboard
                   </button>
-                </div>
+                </div> */}
               </article>
             </form>
           </div>

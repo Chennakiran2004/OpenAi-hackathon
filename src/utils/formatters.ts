@@ -4,9 +4,10 @@
  * @returns Formatted currency string
  */
 export function formatCurrency(amount: number | string): string {
-    const num = typeof amount === 'string' ? parseFloat(amount) : amount;
+    const parsed = typeof amount === 'string' ? parseFloat(amount) : amount;
+    const num = Number(parsed);
 
-    if (isNaN(num)) return '₹0';
+    if (!Number.isFinite(num)) return '₹0';
 
     // Indian number system (lakhs, crores)
     if (num >= 10000000) {
@@ -26,9 +27,10 @@ export function formatCurrency(amount: number | string): string {
  * @returns Formatted number string
  */
 export function formatNumber(num: number | string): string {
-    const n = typeof num === 'string' ? parseFloat(num) : num;
+    const parsed = typeof num === 'string' ? parseFloat(num) : num;
+    const n = Number(parsed);
 
-    if (isNaN(n)) return '0';
+    if (!Number.isFinite(n)) return '0';
 
     return n.toLocaleString('en-IN', { maximumFractionDigits: 2 });
 }
@@ -39,9 +41,10 @@ export function formatNumber(num: number | string): string {
  * @returns Formatted weight string
  */
 export function formatTonnes(tonnes: number | string): string {
-    const num = typeof tonnes === 'string' ? parseFloat(tonnes) : tonnes;
+    const parsed = typeof tonnes === 'string' ? parseFloat(tonnes) : tonnes;
+    const num = Number(parsed);
 
-    if (isNaN(num)) return '0 T';
+    if (!Number.isFinite(num)) return '0 T';
 
     if (num >= 1000000) {
         return `${(num / 1000000).toFixed(2)} MT`;

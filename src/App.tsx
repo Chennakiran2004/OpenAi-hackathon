@@ -1,7 +1,23 @@
 import React, { useEffect } from "react";
-import { Routes, Route, Navigate, useNavigate, useLocation } from "react-router-dom";
-import { getAccessToken, getStoredRole, getStoredUser, clearAccessToken } from "./api/clientapi";
-import { AuthProvider, useAuth, storedUserToUser } from "./contexts/AuthContext";
+import {
+  Routes,
+  Route,
+  Navigate,
+  useNavigate,
+  useLocation,
+} from "react-router-dom";
+import {
+  getAccessToken,
+  getStoredRole,
+  getStoredSector,
+  getStoredUser,
+  clearAccessToken,
+} from "./api/clientapi";
+import {
+  AuthProvider,
+  useAuth,
+  storedUserToUser,
+} from "./contexts/AuthContext";
 import { RecruiterProvider } from "./contexts/RecruiterContext";
 import AuthPage from "./components/AuthPage";
 import LandingPage from "./components/LandingPage";
@@ -12,9 +28,17 @@ import OptimizationResults from "./components/OptimizationResults";
 import QueryHistory from "./components/QueryHistory";
 import ImpactDashboard from "./components/ImpactDashboard";
 import DemandPrediction from "./components/DemandPrediction";
+import PetroleumSector from "./components/PetroleumSector";
+import SectorSelect from "./components/SectorSelect";
 import TopBar from "./components/TopBar";
 import { appStyles as styles } from "./stylecomponent";
 
+function getDefaultPrivateRoute(): string {
+  const sector = getStoredSector();
+  if (sector === "petroleum") return "/petroleum/dashboard";
+  if (sector === "agriculture") return "/dashboard";
+  return "/choose-sector";
+}
 
 function SessionRestore() {
   const navigate = useNavigate();
@@ -39,9 +63,10 @@ function SessionRestore() {
 
     // Only redirect to /dashboard if user is on a public page (e.g., / or /auth)
     // Don't redirect if they're already on a protected route like /profile or /dashboard
-    const isPublicPage = location.pathname === "/" || location.pathname === "/auth";
+    const isPublicPage =
+      location.pathname === "/" || location.pathname === "/auth";
     if (isPublicPage) {
-      navigate("/dashboard", { replace: true });
+      navigate(getDefaultPrivateRoute(), { replace: true });
     }
   }, [navigate, setUser, setSessionRestored, location.pathname]);
   return null;
@@ -72,84 +97,68 @@ function AppContent() {
       {showTopBar && (
         <TopBar
           isLoggedIn={Boolean(user)}
-          onBrandClick={() => navigate(user ? "/dashboard" : "/")}
+          onBrandClick={() => navigate(user ? getDefaultPrivateRoute() : "/")}
           onSignIn={() => navigate("/auth")}
           onSignUp={() => navigate("/auth?mode=signup")}
           onLogout={logout}
         />
       )}
-      <main className={showTopBar ? `${styles.container} ${styles.main}` : ''}>
+      <main className={showTopBar ? `${styles.container} ${styles.main}` : ""}>
         <Routes>
           <Route
             path="/"
             element={
               <LandingPage
-                onRequestDemo={() => navigate("/auth?mode=signup&role=state_officer")}
-                onViewSandbox={() => navigate("/auth?mode=signup&role=central_admin")}
+                onRequestDemo={() =>
+                  navigate("/auth?mode=signup&role=state_officer")
+                }
+                onViewSandbox={() =>
+                  navigate("/auth?mode=signup&role=central_admin")
+                }
                 onSignIn={() => navigate("/auth")}
               />
             }
           />
           <Route path="/auth" element={<AuthPage />} />
           <Route
+            path="/choose-sector"
+            element={!user ? <Navigate to="/" replace /> : <SectorSelect />}
+          />
+          <Route
             path="/dashboard"
-            element={
-              !user ? (
-                <Navigate to="/" replace />
-              ) : (
-                <Dashboard />
-              )
-            }
+            element={!user ? <Navigate to="/" replace /> : <Dashboard />}
           />
           <Route
             path="/optimize"
-            element={
-              !user ? (
-                <Navigate to="/" replace />
-              ) : (
-                <OptimizeForm />
-              )
-            }
+            element={!user ? <Navigate to="/" replace /> : <OptimizeForm />}
           />
           <Route
             path="/results/:id"
             element={
-              !user ? (
-                <Navigate to="/" replace />
-              ) : (
-                <OptimizationResults />
-              )
+              !user ? <Navigate to="/" replace /> : <OptimizationResults />
             }
           />
           <Route
             path="/history"
-            element={
-              !user ? (
-                <Navigate to="/" replace />
-              ) : (
-                <QueryHistory />
-              )
-            }
+            element={!user ? <Navigate to="/" replace /> : <QueryHistory />}
           />
           <Route
             path="/predict"
-            element={
-              !user ? (
-                <Navigate to="/" replace />
-              ) : (
-                <DemandPrediction />
-              )
-            }
+            element={!user ? <Navigate to="/" replace /> : <DemandPrediction />}
           />
           <Route
             path="/impact"
+            element={!user ? <Navigate to="/" replace /> : <ImpactDashboard />}
+          />
+          <Route
+            path="/petroleum"
             element={
-              !user ? (
-                <Navigate to="/" replace />
-              ) : (
-                <ImpactDashboard />
-              )
+              !user ? <Navigate to="/" replace /> : <Navigate to="/petroleum/dashboard" replace />
             }
+          />
+          <Route
+            path="/petroleum/:tab"
+            element={!user ? <Navigate to="/" replace /> : <PetroleumSector />}
           />
           <Route
             path="/profile"
@@ -160,14 +169,21 @@ function AppContent() {
                 <ProfilePage
                   user={user}
                   onUpdateProfile={({ name: newName, email: newEmail }) =>
-                    setUser((u) => (u ? { ...u, name: newName, email: newEmail } : null))
+                    setUser((u) =>
+                      u ? { ...u, name: newName, email: newEmail } : null,
+                    )
                   }
-                  onBackToHome={() => navigate("/dashboard")}
+                  onBackToHome={() => navigate(getDefaultPrivateRoute())}
                 />
               )
             }
           />
-          <Route path="*" element={<Navigate to="/" replace />} />
+          <Route
+            path="*"
+            element={
+              <Navigate to={user ? getDefaultPrivateRoute() : "/"} replace />
+            }
+          />
         </Routes>
       </main>
     </>

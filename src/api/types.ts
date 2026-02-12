@@ -117,6 +117,7 @@ export type OptimizeResultItem = {
   distance_km: number;
   estimated_delivery_days: number;
   carbon_footprint_kg: number;
+  transport_mode?: string;
   ranking_category: string;
   ranking_score: number;
 };
@@ -224,4 +225,191 @@ export type CropPrice = {
   price_per_tonne: string;
   year: number;
   source: string;
+};
+
+/** ---------------- Petroleum sector types ---------------- */
+
+export type PetroleumCrudeProductionRecord = {
+  id: number;
+  month: string;
+  year: number;
+  company_name: string;
+  quantity: number;
+};
+
+export type PetroleumRefineryProcessingRecord = {
+  id: number;
+  month: string;
+  year: number;
+  refinery_name: string;
+  quantity: number;
+};
+
+export type PetroleumProductProductionRecord = {
+  id: number;
+  month: string;
+  year: number;
+  product: string;
+  quantity: number;
+};
+
+export type PetroleumImportExportSnapshotRecord = {
+  id: number;
+  import_export: "Import" | "Export";
+  product: string;
+  monthly_data: Record<string, number>;
+  total: number;
+};
+
+export type PetroleumTradeRecord = {
+  id: number;
+  month: number;
+  year: number;
+  product: string;
+  trade_type: "Import" | "Export";
+  quantity: number;
+  value_inr_crore: number;
+  value_usd_million: number;
+  date_updated: string;
+};
+
+export type PetroleumFilterOptions = {
+  companies: string[];
+  refineries: string[];
+  production_products: string[];
+  trade_products: string[];
+  years: {
+    crude_production: number[];
+    refinery_processing: number[];
+    product_production: number[];
+    trade: number[];
+  };
+};
+
+export type PetroleumCrudeForecastHistoricalPoint = {
+  year: number;
+  company_name: string;
+  total_quantity: number;
+};
+
+export type PetroleumCrudeForecastPoint = {
+  year: number;
+  predicted_quantity: number;
+};
+
+export type PetroleumCrudeForecastAI = {
+  forecast: PetroleumCrudeForecastPoint[];
+  trend: "increasing" | "stable" | "declining" | string;
+  confidence: number;
+  import_implication: string;
+  analysis: string;
+  error?: string;
+};
+
+export type PetroleumCrudeForecastResponse = {
+  company: string;
+  historical_data: PetroleumCrudeForecastHistoricalPoint[];
+  forecast: PetroleumCrudeForecastAI;
+};
+
+export type PetroleumRefineryYearlyTrend = {
+  year: number;
+  refinery_name: string;
+  total_processed: number;
+};
+
+export type PetroleumRefinerySeasonalPoint = {
+  month: string;
+  avg_quantity: number;
+};
+
+export type PetroleumRefineryAnalysisResponse = {
+  refinery: string;
+  year_filter: number | null;
+  yearly_trends: PetroleumRefineryYearlyTrend[];
+  seasonal_pattern: PetroleumRefinerySeasonalPoint[];
+};
+
+export type PetroleumDemandSupplyProductionPoint = {
+  product: string;
+  year: number;
+  domestic_production: number;
+};
+
+export type PetroleumDemandSupplyImportPoint = {
+  product: string;
+  year: number;
+  import_quantity: number;
+  import_value_inr: number;
+};
+
+export type PetroleumDemandSupplyExportPoint = {
+  product: string;
+  year: number;
+  export_quantity: number;
+  export_value_inr: number;
+};
+
+export type PetroleumDemandSupplyGapResponse = {
+  product_filter: string;
+  year_filter: number | null;
+  production: PetroleumDemandSupplyProductionPoint[];
+  imports: PetroleumDemandSupplyImportPoint[];
+  exports: PetroleumDemandSupplyExportPoint[];
+};
+
+export type PetroleumImportCostItem = {
+  year: number;
+  product: string;
+  total_quantity: number;
+  total_value_inr: number;
+  total_value_usd: number;
+};
+
+export type PetroleumImportCostForecastPoint = {
+  year: number;
+  estimated_bill_inr_crore: number;
+  estimated_bill_usd_million: number;
+};
+
+export type PetroleumImportCostAIForecast = {
+  forecast?: PetroleumImportCostForecastPoint[];
+  key_drivers?: string[];
+  risk_factors?: string[];
+  analysis?: string;
+  error?: string;
+  confidence?: number;
+};
+
+export type PetroleumImportCostAnalysisResponse = {
+  year_filter: number | null;
+  import_data: PetroleumImportCostItem[];
+  ai_forecast: PetroleumImportCostAIForecast;
+};
+
+export type PetroleumTradeBalanceProduct = {
+  product: string;
+  import_quantity: number;
+  export_quantity: number;
+  net_quantity: number;
+  status: "net_importer" | "net_exporter" | string;
+  import_value_inr_crore: number;
+  export_value_inr_crore: number;
+};
+
+export type PetroleumTradeBalanceResponse = {
+  year_filter: number | null;
+  products: PetroleumTradeBalanceProduct[];
+};
+
+export type PetroleumIntelligenceFinding = {
+  title: string;
+  detail: string;
+};
+
+export type PetroleumIntelligenceResponse = {
+  headline: string;
+  key_findings: PetroleumIntelligenceFinding[];
+  strategic_recommendations: string[];
+  risk_assessment: string;
 };

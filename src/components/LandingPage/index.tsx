@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import * as S from "./stylecomponent";
-import IndiaNetworkBackground from "../background/IndiaNetworkBackground";
+import { ButtonsContainer } from "./stylecomponent";
 
 type LandingPageProps = {
   onRequestDemo: () => void;
@@ -12,7 +12,7 @@ type LandingPageProps = {
 type FeatureCardProps = {
   title: string;
   description: string;
-  icon?: string;
+  icon: string;
   delay?: number;
 };
 
@@ -71,12 +71,12 @@ function AnimatedMetric({
   label: string;
   delay?: number;
 }) {
-  const numericValue = parseFloat(stat.replace(/[^0-9.]/g, ""));
-  const hasNumber = !isNaN(numericValue);
-  const suffix = stat.replace(/[0-9.]/g, "");
+  // Animate only plain numeric metrics to avoid corrupting values like "10-20%" or "<5s".
+  const hasNumber = /^\d+(\.\d+)?$/.test(stat);
+  const numericValue = hasNumber ? parseFloat(stat) : NaN;
 
   const [sectionRef, isVisible] = useScrollAnimation();
-  const [count, setCount] = useState(hasNumber ? 0 : stat);
+  const [count, setCount] = useState(hasNumber ? 0 : Number.NaN);
 
   useEffect(() => {
     if (!isVisible || !hasNumber) return;
@@ -101,18 +101,18 @@ function AnimatedMetric({
 
   return (
     <S.MetricCard ref={sectionRef} $delay={delay} $isVisible={isVisible}>
-      <S.MetricValue>{hasNumber ? `${count}${suffix}` : stat}</S.MetricValue>
+      <S.MetricValue>{hasNumber ? `${count}` : stat}</S.MetricValue>
       <S.MetricLabel>{label}</S.MetricLabel>
     </S.MetricCard>
   );
 }
 
-function FeatureCard({ title, description, delay = 0 }: FeatureCardProps) {
+function FeatureCard({ title, description, icon, delay = 0 }: FeatureCardProps) {
   const [ref, isVisible] = useScrollAnimation();
 
   return (
     <S.FeatureCard ref={ref} $isVisible={isVisible} $delay={delay}>
-      <S.FeatureIcon>✨</S.FeatureIcon>
+      <S.FeatureIcon>{icon}</S.FeatureIcon>
       <S.FeatureTitle>{title}</S.FeatureTitle>
       <S.FeatureBody>{description}</S.FeatureBody>
     </S.FeatureCard>
@@ -231,21 +231,25 @@ function LandingPage({
   const features = [
     {
       title: "Optimization Engine",
+      icon: "⚙️",
       description:
         "Ranks source states by total cost, time, and carbon with configurable weights.",
     },
     {
       title: "Live Availability",
+      icon: "📊",
       description:
         "Ingests government crop yield & price feeds to keep decisions current.",
     },
     {
       title: "Impact Dashboard",
+      icon: "🌱",
       description:
         "Savings, carbon reduction, and delivery time improvements for every decision.",
     },
     {
       title: "Alerts & Forecasts",
+      icon: "🚨",
       description:
         "Shortage warnings, surplus redirection, and disaster signals for proactive action.",
     },
@@ -274,7 +278,6 @@ function LandingPage({
 
   return (
     <>
-      <IndiaNetworkBackground />
       <S.Page>
         <S.Container>
           <Hero
@@ -331,6 +334,7 @@ function LandingPage({
                   <FeatureCard
                     key={feature.title}
                     title={feature.title}
+                    icon={feature.icon}
                     description={feature.description}
                     delay={index * 0.1}
                   />
@@ -341,21 +345,21 @@ function LandingPage({
 
           <AnimatedSection delay={0.4}>
             <S.CTASection>
-              <S.CTATitle>Ready to Optimize Inter-State Procurement?</S.CTATitle>
+              <S.CTATitle>
+                Ready to Optimize Inter-State Procurement?
+              </S.CTATitle>
               <S.CTADescription>
                 Pilot Bharat Krishi Setu to cut costs, speed deliveries, and
                 shrink carbon emissions.
               </S.CTADescription>
+              <ButtonsContainer>
               <S.CTAButton type="button" onClick={onRequestDemo}>
                 Request Government Pilot
               </S.CTAButton>
-              <S.ButtonSecondary
-                type="button"
-                style={{ marginTop: "0.75rem" }}
-                onClick={onViewSandbox}
-              >
+              <S.ButtonSecondary type="button" onClick={onViewSandbox}>
                 Explore Sandbox Data
               </S.ButtonSecondary>
+              </ButtonsContainer>
             </S.CTASection>
           </AnimatedSection>
         </S.Container>

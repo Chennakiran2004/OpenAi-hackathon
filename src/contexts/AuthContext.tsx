@@ -2,7 +2,9 @@
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import {
   clearAccessToken,
+  clearStoredSector,
   getErrorMessage,
+  getStoredSector,
   setAccessToken,
   setStoredRole,
   setStoredUser,
@@ -16,9 +18,7 @@ import type { RegisterPayload, StoredUser, StateOption, DistrictOption } from ".
 import type { AuthMode, Role, User } from "../components/types";
 
 function storedUserToUser(stored: StoredUser, role: Role): User {
-  const name = stored.profile?.state_name
-    ? `${stored.username} (${stored.profile.state_name})`
-    : stored.username;
+  const name = stored.username;
   const email = stored.profile?.phone ?? "";
   const profile = stored.profile
     ? {
@@ -29,6 +29,13 @@ function storedUserToUser(stored: StoredUser, role: Role): User {
     }
     : undefined;
   return { name, email, role, profile };
+}
+
+function getRouteForStoredSector(): string {
+  const sector = getStoredSector();
+  if (sector === "petroleum") return "/petroleum/dashboard";
+  if (sector === "agriculture") return "/dashboard";
+  return "/choose-sector";
 }
 
 type AuthContextValue = {
@@ -164,7 +171,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             profile: data.profile,
           });
           setUser(storedUserToUser({ user_id: data.user_id, username: data.username, profile: data.profile }, roleChoice));
-          navigate("/home");
+          navigate(getRouteForStoredSector(), { replace: true });
         } catch (err) {
           setAuthError(getErrorMessage(err));
         }
@@ -230,7 +237,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
           setStoredUser(storedUser);
           setUser(storedUserToUser(storedUser, roleChoice));
-          navigate("/home");
+          clearStoredSector();
+          navigate("/choose-sector", { replace: true });
         } catch (err) {
           setAuthError(getErrorMessage(err));
         }
@@ -322,4 +330,3 @@ export function useAuth(): AuthContextValue {
 }
 
 export { storedUserToUser };
-

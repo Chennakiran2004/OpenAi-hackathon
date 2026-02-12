@@ -1,4 +1,4 @@
-import styled, { keyframes } from 'styled-components';
+import styled, { keyframes } from "styled-components";
 
 // Animation keyframes
 const fadeInUp = keyframes`
@@ -53,43 +53,58 @@ const pulse = keyframes`
 
 // Base page styles
 export const Page = styled.div`
-  --tf-bg-page: #111111;
-  --tf-bg-surface: #282828;
-  --tf-bg-soft: #282828;
-  --tf-text-primary: #E0E0E0;
-  --tf-text-secondary: #E0E0E0;
-  --tf-text-muted: #999999;
-  --tf-accent: #666666;
-  --tf-accent-light: #888888;
-  --tf-accent-hover: #555555;
-  --tf-accent-secondary: #666666;
-  --tf-primary: #000000;
-  --tf-border-subtle: rgba(102, 102, 102, 0.3);
-  --tf-border-medium: rgba(102, 102, 102, 0.5);
-  --tf-border: rgba(102, 102, 102, 0.3);
-  --tf-disabled: rgba(102, 102, 102, 0.4);
-  --tf-focus-ring: #888888;
-  --tf-shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.5);
-  --tf-shadow-md: 0 4px 16px rgba(0, 0, 0, 0.6);
-  --tf-shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.7);
-  
+  --tf-bg-page: var(--color-brand-light);
+  --tf-bg-surface: #ffffff;
+  --tf-bg-soft: var(--color-primary-50);
+  --tf-text-primary: var(--color-gray-900);
+  --tf-text-secondary: var(--color-gray-600);
+  --tf-text-muted: var(--color-gray-500);
+  --tf-accent: var(--color-brand-primary);
+  --tf-accent-light: var(--color-brand-accent);
+  --tf-accent-hover: var(--color-primary-700);
+  --tf-accent-secondary: var(--color-brand-accent);
+  --tf-primary: var(--color-brand-primary);
+  --tf-border-subtle: var(--color-gray-200);
+  --tf-border-medium: var(--color-gray-300);
+  --tf-border: var(--color-gray-200);
+  --tf-disabled: var(--color-gray-300);
+  --tf-focus-ring: var(--color-brand-accent);
+  --tf-shadow-sm: var(--shadow-sm);
+  --tf-shadow-md: var(--shadow-md);
+  --tf-shadow-lg: var(--shadow-lg);
+
   min-height: 100vh;
-  background: transparent;
+  background:
+    radial-gradient(circle at 0% 0%, rgba(43, 182, 115, 0.1), transparent 38%),
+    radial-gradient(
+      circle at 100% 10%,
+      rgba(31, 122, 77, 0.08),
+      transparent 32%
+    ),
+    var(--tf-bg-page);
   color: var(--tf-text-primary);
   position: relative;
   z-index: 0;
   overflow-x: hidden;
 
   &::before {
-    content: '';
+    content: "";
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background: 
-      radial-gradient(ellipse at 50% 30%, rgba(17, 17, 17, 0.4), transparent 60%),
-      radial-gradient(ellipse at 80% 70%, rgba(17, 17, 17, 0.2), transparent 50%);
+    background:
+      radial-gradient(
+        ellipse at 50% 30%,
+        rgba(43, 182, 115, 0.06),
+        transparent 60%
+      ),
+      radial-gradient(
+        ellipse at 80% 70%,
+        rgba(31, 122, 77, 0.04),
+        transparent 50%
+      );
     pointer-events: none;
     z-index: 0;
   }
@@ -130,10 +145,13 @@ type AnimatedSectionProps = {
 };
 
 export const AnimatedSection = styled.div<AnimatedSectionProps>`
-  opacity: ${props => (props.$isVisible ? 1 : 0)};
-  transform: ${props => (props.$isVisible ? 'translateY(0)' : 'translateY(30px)')};
-  transition: opacity 0.8s ease-out, transform 0.8s ease-out;
-  transition-delay: ${props => `${props.$delay || 0}s`};
+  opacity: ${(props) => (props.$isVisible ? 1 : 0)};
+  transform: ${(props) =>
+    props.$isVisible ? "translateY(0)" : "translateY(30px)"};
+  transition:
+    opacity 0.8s ease-out,
+    transform 0.8s ease-out;
+  transition-delay: ${(props) => `${props.$delay || 0}s`};
 `;
 
 // Hero Section
@@ -180,12 +198,17 @@ export const BorderLeft = styled.div`
   background: var(--tf-border-subtle);
 
   &::before {
-    content: '';
+    content: "";
     position: absolute;
     top: 0;
     height: 160px;
     width: 1px;
-    background: linear-gradient(to bottom, transparent, var(--tf-accent), transparent);
+    background: linear-gradient(
+      to bottom,
+      transparent,
+      var(--tf-accent),
+      transparent
+    );
   }
 `;
 
@@ -198,12 +221,17 @@ export const BorderRight = styled.div`
   background: var(--tf-border-subtle);
 
   &::before {
-    content: '';
+    content: "";
     position: absolute;
     top: 0;
     height: 160px;
     width: 1px;
-    background: linear-gradient(to bottom, transparent, var(--tf-accent), transparent);
+    background: linear-gradient(
+      to bottom,
+      transparent,
+      var(--tf-accent),
+      transparent
+    );
   }
 `;
 
@@ -216,13 +244,18 @@ export const BorderBottom = styled.div`
   background: var(--tf-border-subtle);
 
   &::before {
-    content: '';
+    content: "";
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
     height: 1px;
     width: 160px;
-    background: linear-gradient(to right, transparent, var(--tf-accent), transparent);
+    background: linear-gradient(
+      to right,
+      transparent,
+      var(--tf-accent),
+      transparent
+    );
   }
 `;
 
@@ -248,7 +281,7 @@ export const HeroTitleNew = styled.h1`
   font-weight: 800;
   line-height: 1.1;
   letter-spacing: -0.02em;
-  color: #ffffff;
+  color: var(--tf-text-primary);
 
   @media (max-width: 768px) {
     font-size: clamp(1.5rem, 5vw, 2.5rem);
@@ -265,7 +298,7 @@ export const HeroSubtitleNew = styled.p`
   font-size: 1.125rem;
   line-height: 1.7;
   font-weight: 400;
-  color: rgba(203, 213, 225, 0.9);
+  color: var(--tf-text-secondary);
 `;
 
 export const CTAGroupNew = styled.div`
@@ -328,7 +361,7 @@ export const HeroBadge = styled.div`
   align-items: center;
   gap: 0.5rem;
   padding: 0.5rem 1rem;
-  background: rgba(102, 102, 102, 0.15);
+  background: var(--tf-bg-soft);
   border: 1px solid var(--tf-border-subtle);
   border-radius: 50px;
   font-size: 0.75rem;
@@ -392,8 +425,12 @@ export const HeroStatValue = styled.div`
   font-weight: 800;
   color: var(--tf-primary);
   line-height: 1;
-  font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', 'Monaco', 'Courier New', monospace;
-  font-feature-settings: 'liga' 1, 'calt' 1;
+  font-family:
+    "JetBrains Mono", "Fira Code", "Consolas", "Monaco", "Courier New",
+    monospace;
+  font-feature-settings:
+    "liga" 1,
+    "calt" 1;
 `;
 
 export const HeroStatLabel = styled.div`
@@ -412,12 +449,16 @@ export const CTAGroup = styled.div`
 
 export const ButtonPrimary = styled.button`
   padding: 0.875rem 2rem;
+  min-height: 52px;
   background: var(--tf-accent);
-  color: var(--tf-text-primary);
+  color: #ffffff;
   border: 1px solid var(--tf-accent);
   border-radius: 12px;
   font-size: 1rem;
   font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
   transition: all 0.3s ease;
   box-shadow: var(--tf-shadow-md);
@@ -425,13 +466,18 @@ export const ButtonPrimary = styled.button`
   overflow: hidden;
 
   &::before {
-    content: '';
+    content: "";
     position: absolute;
     top: 0;
     left: -100%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.1),
+      transparent
+    );
     transition: left 0.5s;
   }
 
@@ -464,15 +510,15 @@ export const ButtonPrimary = styled.button`
 `;
 
 export const ButtonSecondary = styled(ButtonPrimary)`
-  background: transparent;
-  color: var(--tf-text-primary);
-  border: 1px solid var(--tf-border-medium);
-  box-shadow: none;
+  background: var(--tf-accent-light);
+  color: #ffffff;
+  border: 1px solid var(--tf-accent-light);
+  box-shadow: var(--tf-shadow-sm);
 
   &:hover {
-    background: rgba(102, 102, 102, 0.1);
+    background: var(--tf-accent);
     border-color: var(--tf-accent);
-    box-shadow: var(--tf-shadow-sm);
+    box-shadow: var(--tf-shadow-md);
   }
 `;
 
@@ -519,7 +565,11 @@ export const HeroVisual = styled.div`
 export const VisualGradient = styled.div`
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, var(--tf-bg-surface) 0%, rgba(102, 102, 102, 0.1) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--tf-bg-surface) 0%,
+    rgba(43, 182, 115, 0.12) 100%
+  );
   background-size: 200% 200%;
   animation: ${gradientShift} 8s ease infinite;
 `;
@@ -579,10 +629,15 @@ export const MetricCard = styled.article<MetricCardProps>`
   text-align: center;
   transition: all 0.3s ease;
   box-shadow: var(--tf-shadow-sm);
-  opacity: ${props => (props.$isVisible ? 1 : 0)};
-  transform: ${props => (props.$isVisible ? 'translateY(0) scale(1)' : 'translateY(20px) scale(0.95)')};
-  transition: opacity 0.6s ease, transform 0.6s ease;
-  transition-delay: ${props => `${props.$delay || 0}s`};
+  opacity: ${(props) => (props.$isVisible ? 1 : 0)};
+  transform: ${(props) =>
+    props.$isVisible
+      ? "translateY(0) scale(1)"
+      : "translateY(20px) scale(0.95)"};
+  transition:
+    opacity 0.6s ease,
+    transform 0.6s ease;
+  transition-delay: ${(props) => `${props.$delay || 0}s`};
 
   &:hover {
     transform: translateY(-4px) scale(1.02);
@@ -595,11 +650,15 @@ export const MetricCard = styled.article<MetricCardProps>`
 export const MetricValue = styled.div`
   font-size: clamp(2rem, 4vw, 3rem);
   font-weight: 800;
-  color: var(--tf-text-primary);
+  color: var(--tf-primary);
   line-height: 1;
   margin-bottom: 0.5rem;
-  font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', 'Monaco', 'Courier New', monospace;
-  font-feature-settings: 'liga' 1, 'calt' 1;
+  font-family:
+    "JetBrains Mono", "Fira Code", "Consolas", "Monaco", "Courier New",
+    monospace;
+  font-feature-settings:
+    "liga" 1,
+    "calt" 1;
 `;
 
 export const MetricLabel = styled.p`
@@ -659,7 +718,7 @@ export const StepCard = styled.article`
   overflow: hidden;
 
   &::before {
-    content: '';
+    content: "";
     position: absolute;
     top: 0;
     left: 0;
@@ -689,8 +748,12 @@ export const StepNumber = styled.div`
   opacity: 0.2;
   line-height: 1;
   margin-bottom: 1rem;
-  font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', 'Monaco', 'Courier New', monospace;
-  font-feature-settings: 'liga' 1, 'calt' 1;
+  font-family:
+    "JetBrains Mono", "Fira Code", "Consolas", "Monaco", "Courier New",
+    monospace;
+  font-feature-settings:
+    "liga" 1,
+    "calt" 1;
 `;
 
 export const StepTitle = styled.h3`
@@ -730,10 +793,13 @@ export const FeatureCard = styled.article<FeatureCardProps>`
   padding: 2rem;
   transition: all 0.3s ease;
   box-shadow: var(--tf-shadow-sm);
-  opacity: ${props => (props.$isVisible ? 1 : 0)};
-  transform: ${props => (props.$isVisible ? 'translateY(0)' : 'translateY(20px)')};
-  transition: opacity 0.6s ease, transform 0.6s ease;
-  transition-delay: ${props => `${props.$delay || 0}s`};
+  opacity: ${(props) => (props.$isVisible ? 1 : 0)};
+  transform: ${(props) =>
+    props.$isVisible ? "translateY(0)" : "translateY(20px)"};
+  transition:
+    opacity 0.6s ease,
+    transform 0.6s ease;
+  transition-delay: ${(props) => `${props.$delay || 0}s`};
 
   &:hover {
     transform: translateY(-4px);
@@ -747,7 +813,6 @@ export const FeatureIcon = styled.div`
   font-size: 2rem;
   margin-bottom: 1rem;
   display: inline-block;
-  animation: ${float} 3s ease-in-out infinite;
 `;
 
 export const FeatureTitle = styled.h3`
@@ -774,16 +839,25 @@ export const CTASection = styled.section`
   color: var(--tf-text-primary);
   margin-bottom: 4rem;
   position: relative;
+
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 
   &::before {
-    content: '';
+    content: "";
     position: absolute;
     top: -50%;
     right: -50%;
     width: 200%;
     height: 200%;
-    background: radial-gradient(circle, rgba(102, 102, 102, 0.05) 0%, transparent 70%);
+    background: radial-gradient(
+      circle,
+      rgba(43, 182, 115, 0.08) 0%,
+      transparent 70%
+    );
     animation: ${float} 6s ease-in-out infinite;
   }
 
@@ -812,22 +886,26 @@ export const CTADescription = styled.p`
 `;
 
 export const CTAButton = styled.button`
-  padding: 1rem 2.5rem;
+  padding: 0.875rem 2rem;
+  min-height: 52px;
   background: var(--tf-accent);
-  color: var(--tf-text-primary);
+  color: #ffffff;
   border: none;
   border-radius: 12px;
-  font-size: 1.125rem;
+  font-size: 1rem;
   font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  box-shadow: var(--tf-shadow-md);
   position: relative;
   z-index: 1;
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.6);
+    box-shadow: var(--tf-shadow-lg);
     background: var(--tf-accent-hover);
   }
 
@@ -839,6 +917,13 @@ export const CTAButton = styled.button`
     outline: 3px solid var(--tf-focus-ring);
     outline-offset: 2px;
   }
+`;
+
+export const ButtonsContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  gap: 1rem;
 `;
 
 // New minimal hero overlay layout
