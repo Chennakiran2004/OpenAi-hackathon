@@ -34,7 +34,7 @@ import type {
 import type { Role } from '../../components/types';
 
 // const BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://10.10.27.98:8000';
-const BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://10.10.27.62:8000';
+const BASE_URL = process.env.REACT_APP_API_BASE_URL || 'https://testy-jenny-agriwow-8b798c0c.koyeb.app';
 const ACCESS_TOKEN_KEY = 'tf_access_token';
 const ROLE_KEY = 'tf_role';
 const STORED_USER_KEY = 'tf_stored_user';
