@@ -127,8 +127,10 @@ export function formatRelativeTime(date: string | Date): string {
  * @param date - Date string or Date object
  * @returns Formatted date string
  */
-export function formatDate(date: string | Date): string {
+export function formatDate(date: string | Date | null | undefined): string {
+    if (!date) return 'N/A';
     const d = typeof date === 'string' ? new Date(date) : date;
+    if (!d || isNaN(d.getTime())) return 'N/A';
     return d.toLocaleDateString('en-IN', {
         year: 'numeric',
         month: 'short',
@@ -141,8 +143,10 @@ export function formatDate(date: string | Date): string {
  * @param date - Date string or Date object
  * @returns Formatted date-time string
  */
-export function formatDateTime(date: string | Date): string {
+export function formatDateTime(date: string | Date | null | undefined): string {
+    if (!date) return 'N/A';
     const d = typeof date === 'string' ? new Date(date) : date;
+    if (!d || isNaN(d.getTime())) return 'N/A';
     return d.toLocaleDateString('en-IN', {
         year: 'numeric',
         month: 'short',
