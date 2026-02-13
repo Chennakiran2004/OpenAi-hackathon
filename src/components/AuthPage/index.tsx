@@ -33,6 +33,7 @@ function AuthPage() {
     designation,
     setDesignation,
     authError,
+    authLoading,
     submitAuth,
     switchMode,
   } = useAuth();
@@ -156,8 +157,18 @@ function AuthPage() {
               </div>
             )}
 
-            <Button type="submit" variant="primary" fullWidth size="lg">
-              {authMode === 'signin' ? 'Sign In' : 'Create Account'}
+            <Button
+              type="submit"
+              variant="primary"
+              fullWidth
+              size="lg"
+              loading={authLoading}
+              disabled={authLoading}
+            >
+              {authLoading
+                ? (authMode === 'signin' ? 'Signing In...' : 'Creating Account...')
+                : (authMode === 'signin' ? 'Sign In' : 'Create Account')
+              }
             </Button>
           </form>
 

@@ -1006,7 +1006,6 @@ export default function PetroleumSector() {
                   layout="vertical"
                   data={[...displayProducts].sort((a, b) => b.import_quantity - a.import_quantity)}
                   margin={{ top: 5, right: 30, left: 40, bottom: 5 }}
-                  style={{ position: 'absolute', left: '-83px' }}
                 >
                   <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#f3f4f6" />
                   <XAxis type="number" hide />
@@ -1029,7 +1028,6 @@ export default function PetroleumSector() {
                   layout="vertical"
                   data={[...displayProducts].sort((a, b) => b.export_quantity - a.export_quantity)}
                   margin={{ top: 5, right: 30, left: 40, bottom: 5 }}
-                  style={{ position: 'absolute', left: '-83px' }}
                 >
                   <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#f3f4f6" />
                   <XAxis type="number" hide />
@@ -1052,7 +1050,6 @@ export default function PetroleumSector() {
                   layout="vertical"
                   data={[...displayProducts].sort((a, b) => Math.max(b.import_value_inr_crore, b.export_value_inr_crore) - Math.max(a.import_value_inr_crore, a.export_value_inr_crore))}
                   margin={{ top: 5, right: 30, left: 40, bottom: 5 }}
-                  style={{ position: 'absolute', left: '-83px' }}
                 >
                   <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#f3f4f6" />
                   <XAxis type="number" hide />

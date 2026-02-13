@@ -176,6 +176,11 @@ function extractErrorMessage(err: unknown): string {
 export const getErrorMessage = extractErrorMessage;
 
 function ensureResultsArray<T>(data: unknown): T[] {
+  // If data is already an array, return it directly
+  if (Array.isArray(data)) {
+    return data as T[];
+  }
+  // Otherwise, check if it's a paginated response with 'results' property
   if (data && typeof data === 'object' && 'results' in data && Array.isArray((data as { results: T[] }).results)) {
     return (data as { results: T[] }).results;
   }

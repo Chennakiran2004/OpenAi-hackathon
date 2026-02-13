@@ -70,6 +70,7 @@ type AuthContextValue = {
   designation: string;
   setDesignation: (value: string) => void;
   authError: string | null;
+  authLoading: boolean;
   submitAuth: (event: React.FormEvent<HTMLFormElement>) => Promise<void>;
   logout: () => void;
   switchMode: () => void;
@@ -101,6 +102,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [districtOptionsLoading, setDistrictOptionsLoading] = useState(false);
   const [designation, setDesignation] = useState("");
   const [authError, setAuthError] = useState<string | null>(null);
+  const [authLoading, setAuthLoading] = useState(false);
 
   const loadStateOptions = useCallback(async () => {
     setStateOptionsLoading(true);
@@ -162,6 +164,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const trimmedPassword = password.trim();
 
       if (authMode === "signin") {
+        setAuthLoading(true);
         try {
           const data = await apiLogin(trimmedUsername, trimmedPassword);
           setAccessToken(data.token);
@@ -175,6 +178,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           navigate(getRouteForStoredSector(), { replace: true });
         } catch (err) {
           setAuthError(getErrorMessage(err));
+        } finally {
+          setAuthLoading(false);
         }
         return;
       }
@@ -212,6 +217,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           district_id: Number(districtId),
           designation: designation.trim() || undefined,
         };
+        setAuthLoading(true);
         try {
           const data = await apiRegister(payload);
           setAccessToken(data.token);
@@ -242,6 +248,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           navigate("/choose-sector", { replace: true });
         } catch (err) {
           setAuthError(getErrorMessage(err));
+        } finally {
+          setAuthLoading(false);
         }
       }
     },
@@ -316,6 +324,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     designation,
     setDesignation,
     authError,
+    authLoading,
     submitAuth,
     logout,
     switchMode,

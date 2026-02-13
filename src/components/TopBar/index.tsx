@@ -26,9 +26,10 @@ function TopBar({
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+  const path = window.location.pathname;
 
   return (
-    <header className={`${styles.header} ${scrolled ? styles.headerScrolled : ''}`}>
+    <header className={`${styles.header} ${scrolled ? styles.headerScrolled : ''}`} style={{ display: path === '/auth' ? 'none' : 'block' }} >
       <nav className={styles.navbar} aria-label="Primary">
         <button
           type="button"
@@ -39,13 +40,22 @@ function TopBar({
         </button>
         <div className={styles.actions}>
           {!isLoggedIn && (
-            <button
-              className={styles.primaryButton}
-              type="button"
-              onClick={onSignUp}
-            >
-              Explore Platform
-            </button>
+            <>
+              <button
+                className={styles.secondaryButton}
+                type="button"
+                onClick={onSignIn}
+              >
+                Request Govt Demo
+              </button>
+              <button
+                className={styles.primaryButton}
+                type="button"
+                onClick={onSignUp}
+              >
+                Explore Platform
+              </button>
+            </>
           )}
           {isLoggedIn && (
             <button

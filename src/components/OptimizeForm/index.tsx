@@ -75,6 +75,28 @@ export default function OptimizeForm() {
     }
   }, [cropId]);
 
+  // Auto-fill state and district from user's profile in localStorage
+  useEffect(() => {
+    try {
+      const storedUser = localStorage.getItem('tf_stored_user');
+      if (storedUser) {
+        const user = JSON.parse(storedUser);
+        if (user.profile) {
+          // Auto-fill state if available
+          if (user.profile.state) {
+            setStateId(user.profile.state);
+          }
+          // Auto-fill district if available (will load after state districts are loaded)
+          if (user.profile.district) {
+            setDistrictId(user.profile.district);
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Failed to load user profile from localStorage:', error);
+    }
+  }, []);
+
   async function loadCrops() {
     setCropsLoading(true);
     try {
@@ -172,7 +194,6 @@ export default function OptimizeForm() {
     value: d.id,
     label: d.name,
   }));
-
   return (
     <MainLayout>
       <div className="p-8 animate-fade-in">
@@ -296,11 +317,10 @@ export default function OptimizeForm() {
                       style={{ borderColor: "rgb(52 211 153 / 1)" }}
                       className={`
                       p-4 rounded-lg border-2 bg-white transition-all duration-200 shadow-sm
-                      ${
-                        transportMode === mode.value
+                      ${transportMode === mode.value
                           ? "bg-emerald-50 text-emerald-700 ring-2 ring-emerald-200 shadow-md"
                           : "text-slate-600 hover:text-emerald-600 hover:bg-emerald-50/40"
-                      }
+                        }
                     `}
                     >
                       <div className="mb-2 flex justify-center">{mode.icon}</div>
