@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, Button, LoadingSkeleton } from "../ui";
 import SearchableSelect from "../ui/SearchableSelect";
@@ -82,15 +82,6 @@ export default function DemandPrediction() {
     loadStates();
   }, []);
 
-  // Load prediction when crop or state changes
-  useEffect(() => {
-    if (cropId) {
-      loadPrediction();
-    } else {
-      setPredictionData(null);
-    }
-  }, [cropId, stateId]);
-
   async function loadCrops() {
     setCropsLoading(true);
     try {
@@ -115,7 +106,7 @@ export default function DemandPrediction() {
     }
   }
 
-  async function loadPrediction() {
+  const loadPrediction = useCallback(async () => {
     if (!cropId) return;
 
     setPredictionLoading(true);
@@ -132,7 +123,16 @@ export default function DemandPrediction() {
     } finally {
       setPredictionLoading(false);
     }
-  }
+  }, [cropId, stateId]);
+
+  // Load prediction when crop or state changes
+  useEffect(() => {
+    if (cropId) {
+      loadPrediction();
+    } else {
+      setPredictionData(null);
+    }
+  }, [cropId, loadPrediction]);
 
   const cropOptions: SelectOption[] = crops.map((c) => ({
     value: c.id,
@@ -155,7 +155,7 @@ export default function DemandPrediction() {
   const averageForecastTonnes =
     forecastValues.length > 0
       ? forecastValues.reduce((sum, p) => sum + p.predicted_demand_tonnes, 0) /
-        forecastValues.length
+      forecastValues.length
       : 0;
 
   return (
@@ -270,7 +270,7 @@ export default function DemandPrediction() {
                               className={`p-2 rounded-lg ${predictionData.prediction.trend === "increasing" ? "bg-green-100 text-green-600" : "bg-red-100 text-red-600"}`}
                             >
                               {predictionData.prediction.trend ===
-                              "increasing" ? (
+                                "increasing" ? (
                                 <HiTrendingUp className="text-3xl" />
                               ) : (
                                 <HiTrendingDown className="text-3xl" />
@@ -388,8 +388,8 @@ export default function DemandPrediction() {
                                               label: point.year.toString(),
                                               indexLabel:
                                                 point.year ===
-                                                predictionData.prediction
-                                                  .current_year +
+                                                  predictionData.prediction
+                                                    .current_year +
                                                   1
                                                   ? "Next Year"
                                                   : "",
@@ -413,15 +413,14 @@ export default function DemandPrediction() {
                                     const isCurrentYear =
                                       point.year ===
                                       predictionData.prediction.current_year +
-                                        1;
+                                      1;
                                     return (
                                       <div
                                         key={point.year}
-                                        className={`p-3 rounded-lg border ${
-                                          isCurrentYear
-                                            ? "bg-primary-50 border-brand-primary"
-                                            : "bg-gray-50 border-gray-200"
-                                        }`}
+                                        className={`p-3 rounded-lg border ${isCurrentYear
+                                          ? "bg-primary-50 border-brand-primary"
+                                          : "bg-gray-50 border-gray-200"
+                                          }`}
                                       >
                                         <div className="flex items-start gap-2">
                                           <HiLightBulb className="text-brand-primary text-xl mt-0.5" />
@@ -449,13 +448,12 @@ export default function DemandPrediction() {
                                                 •
                                               </span>
                                               <span
-                                                className={`text-xs font-medium ${
-                                                  point.confidence >= 0.7
-                                                    ? "text-green-600"
-                                                    : point.confidence >= 0.5
-                                                      ? "text-yellow-600"
-                                                      : "text-orange-600"
-                                                }`}
+                                                className={`text-xs font-medium ${point.confidence >= 0.7
+                                                  ? "text-green-600"
+                                                  : point.confidence >= 0.5
+                                                    ? "text-yellow-600"
+                                                    : "text-orange-600"
+                                                  }`}
                                               >
                                                 {(
                                                   point.confidence * 100
@@ -491,7 +489,7 @@ export default function DemandPrediction() {
                                 predictionData.prediction.forecast.reduce(
                                   (max, p) =>
                                     p.predicted_demand_tonnes >
-                                    max.predicted_demand_tonnes
+                                      max.predicted_demand_tonnes
                                       ? p
                                       : max,
                                 ).year
@@ -511,7 +509,7 @@ export default function DemandPrediction() {
                                 predictionData.prediction.forecast.reduce(
                                   (min, p) =>
                                     p.predicted_demand_tonnes <
-                                    min.predicted_demand_tonnes
+                                      min.predicted_demand_tonnes
                                       ? p
                                       : min,
                                 ).year

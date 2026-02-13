@@ -1,4 +1,4 @@
-﻿import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
+import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import {
   clearAccessToken,
@@ -85,6 +85,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [sessionRestored, setSessionRestored] = useState(false);
   const [authMode, setAuthMode] = useState<AuthMode>("signin");
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [roleChoice, setRoleChoice] = useState<Role>("state_officer");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");

@@ -10,8 +10,6 @@ import { HiExclamationCircle } from 'react-icons/hi';
 function AuthPage() {
   const {
     authMode,
-    roleChoice,
-    setRoleChoice,
     username,
     setUsername,
     password,

@@ -292,7 +292,7 @@ export function RecruiterProvider({ children }: { children: React.ReactNode }) {
       setRecommendations([]);
       setAiSummary(null);
     }
-  }, [cropId, quantity, loadHistory]);
+  }, [cropId, quantity, loadHistory, transportMode]);
 
   useEffect(() => {
     // Only load crops if user is authenticated
