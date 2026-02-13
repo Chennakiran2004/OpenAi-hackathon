@@ -13,6 +13,7 @@ type QueryVoiceAgentOpenAIParams = {
   promptVersion?: string;
 };
 
+// API key and options are set via env vars; see .env.example for required keys (copy to .env and set values).
 const OPENAI_API_KEY = process.env.REACT_APP_OPENAI_API_KEY || "";
 const OPENAI_MODEL = process.env.REACT_APP_OPENAI_MODEL || "gpt-4o-mini";
 const OPENAI_BASE_URL =
@@ -137,7 +138,9 @@ export async function queryVoiceAgentOpenAI(
   params: QueryVoiceAgentOpenAIParams
 ): Promise<VoiceAgentResponse> {
   if (!OPENAI_API_KEY) {
-    throw new Error("Missing REACT_APP_OPENAI_API_KEY in .env");
+    throw new Error(
+      "Missing OpenAI API key. Copy .env.example to .env and set REACT_APP_OPENAI_API_KEY with your key."
+    );
   }
 
   const instruction = [
