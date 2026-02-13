@@ -550,6 +550,21 @@ body.docuchat-launcher-visible [data-docuchat-launcher="true"] {
   animation: voiceRingPulse 1.2s ease-out infinite;
 }
 
+.voice-agent-lottie-wrap {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.voice-agent-lottie-wrap canvas {
+  width: 140px !important;
+  height: 140px !important;
+}
+
 .voice-agent-textarea {
   width: 100%;
   border: 1px solid var(--color-gray-300);

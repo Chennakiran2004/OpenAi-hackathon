@@ -9,6 +9,7 @@ import React, {
 } from "react";
 import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "framer-motion";
+import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 import {
   HiMicrophone,
   HiX,
@@ -238,6 +239,7 @@ const VoiceAgent = forwardRef<VoiceAgentHandle, VoiceAgentProps>(function VoiceA
       const finalTranscript = parts.join(" ").trim();
       if (finalTranscript) {
         setTranscript(finalTranscript);
+        submitTranscript(finalTranscript);
       }
     };
 
@@ -273,9 +275,9 @@ const VoiceAgent = forwardRef<VoiceAgentHandle, VoiceAgentProps>(function VoiceA
     return true;
   }
 
-  async function handleSubmitQuery() {
-    const cleanTranscript = transcript.trim();
-    if (!cleanTranscript) {
+  async function submitTranscript(text: string) {
+    const cleanText = text.trim();
+    if (!cleanText) {
       setStatus("error");
       setErrorMessage("Please provide a voice or text query.");
       return;
@@ -286,14 +288,14 @@ const VoiceAgent = forwardRef<VoiceAgentHandle, VoiceAgentProps>(function VoiceA
 
     try {
       const data = MOCK_MODE
-        ? buildMockResponse(cleanTranscript, sector)
+        ? buildMockResponse(cleanText, sector)
         : await queryVoiceAgentOpenAI({
-            sector,
-            transcript: cleanTranscript,
-            language: selectedLanguage,
-            context: window.location.pathname,
-            promptVersion: VOICE_AGENT_PROMPT_VERSION,
-          });
+          sector,
+          transcript: cleanText,
+          language: selectedLanguage,
+          context: window.location.pathname,
+          promptVersion: VOICE_AGENT_PROMPT_VERSION,
+        });
 
       setReply(data.reply_text);
       setConfidence(data.confidence || "");
@@ -312,6 +314,10 @@ const VoiceAgent = forwardRef<VoiceAgentHandle, VoiceAgentProps>(function VoiceA
       setErrorMessage(message);
       setReply(VOICE_AGENT_MISSING_DATA_RESPONSE);
     }
+  }
+
+  function handleSubmitQuery() {
+    submitTranscript(transcript);
   }
 
   const content = (
@@ -368,17 +374,16 @@ const VoiceAgent = forwardRef<VoiceAgentHandle, VoiceAgentProps>(function VoiceA
                 <div className="voice-agent-status-row">
                   <div className="voice-agent-status">
                     <span
-                      className={`voice-status-dot ${
-                        status === "listening"
-                          ? "is-listening"
-                          : status === "processing"
-                            ? "is-processing"
-                            : status === "speaking"
-                              ? "is-speaking"
-                              : status === "error"
-                                ? "is-error"
-                                : ""
-                      }`}
+                      className={`voice-status-dot ${status === "listening"
+                        ? "is-listening"
+                        : status === "processing"
+                          ? "is-processing"
+                          : status === "speaking"
+                            ? "is-speaking"
+                            : status === "error"
+                              ? "is-error"
+                              : ""
+                        }`}
                     />
                     <span className="text-sm font-semibold text-gray-700 capitalize">
                       {status}
@@ -390,17 +395,28 @@ const VoiceAgent = forwardRef<VoiceAgentHandle, VoiceAgentProps>(function VoiceA
                 </div>
 
                 <div className="voice-agent-mic-wrap">
-                  <button
-                    type="button"
-                    onClick={
-                      status === "listening" ? stopListening : startListening
-                    }
-                    className={`voice-agent-mic ${status === "listening" ? "active" : ""}`}
-                  >
-                    <HiMicrophone className="w-9 h-9" />
-                  </button>
+                  {status !== "speaking" && (
+                    <button
+                      type="button"
+                      onClick={
+                        status === "listening" ? stopListening : startListening
+                      }
+                      className={`voice-agent-mic ${status === "listening" ? "active" : ""}`}
+                    >
+                      <HiMicrophone className="w-9 h-9" />
+                    </button>
+                  )}
                   {status === "listening" && (
                     <div className="voice-agent-ring" aria-hidden="true" />
+                  )}
+                  {(status === "listening" || status === "speaking") && (
+                    <div className="voice-agent-lottie-wrap">
+                      <DotLottieReact
+                        src="/animations/listening.lottie"
+                        loop
+                        autoplay
+                      />
+                    </div>
                   )}
                 </div>
 
