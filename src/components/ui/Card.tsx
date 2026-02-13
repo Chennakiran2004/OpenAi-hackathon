@@ -27,6 +27,7 @@ export default function Card({
     };
 
     const hoverStyles = hover || onClick ? 'hover-lift cursor-pointer' : '';
+    const path = window.location.pathname;
 
     return (
         <div
