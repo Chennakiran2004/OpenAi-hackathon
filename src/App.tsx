@@ -31,6 +31,8 @@ import DemandPrediction from "./components/DemandPrediction";
 import PetroleumSector from "./components/PetroleumSector";
 import SectorSelect from "./components/SectorSelect";
 import TopBar from "./components/TopBar";
+import VoiceAgent from "./components/VoiceAgent";
+import type { VoiceAgentSector } from "./api/types";
 import { appStyles as styles } from "./stylecomponent";
 
 function getDefaultPrivateRoute(): string {
@@ -186,8 +188,46 @@ function AppContent() {
           />
         </Routes>
       </main>
+      <VoiceAgentHost />
     </>
   );
+}
+
+const AGRICULTURE_ROUTES = new Set([
+  "/dashboard",
+  "/optimize",
+  "/history",
+  "/predict",
+  "/impact",
+]);
+
+function getVoiceAgentSectorForPath(pathname: string): VoiceAgentSector | null {
+  if (pathname.startsWith("/petroleum")) {
+    return "petroleum";
+  }
+  if (pathname.startsWith("/results/")) {
+    return "agriculture";
+  }
+  if (AGRICULTURE_ROUTES.has(pathname)) {
+    return "agriculture";
+  }
+  return null;
+}
+
+function VoiceAgentHost() {
+  const location = useLocation();
+  const { user } = useAuth();
+
+  if (!user) {
+    return null;
+  }
+
+  const sector = getVoiceAgentSectorForPath(location.pathname);
+  if (!sector) {
+    return null;
+  }
+
+  return <VoiceAgent sector={sector} />;
 }
 
 function App() {

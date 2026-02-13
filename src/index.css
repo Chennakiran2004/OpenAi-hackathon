@@ -260,6 +260,257 @@ input, select, textarea {
   border-radius: 4px;
 }
 
+/* ==================== Voice Agent ==================== */
+@keyframes voiceFabPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(31, 122, 77, 0.45);
+  }
+  70% {
+    box-shadow: 0 0 0 14px rgba(31, 122, 77, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(31, 122, 77, 0);
+  }
+}
+
+@keyframes voiceRingPulse {
+  0% {
+    transform: scale(0.9);
+    opacity: 0.85;
+  }
+  100% {
+    transform: scale(1.35);
+    opacity: 0;
+  }
+}
+
+.voice-agent-fab {
+  position: fixed;
+  right: 1.5rem;
+  bottom: 1.5rem;
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  background: linear-gradient(135deg, var(--color-brand-primary), var(--color-brand-accent));
+  box-shadow: 0 14px 32px rgba(15, 23, 42, 0.3);
+  z-index: 70;
+  animation: voiceFabPulse 2.2s infinite;
+}
+
+.voice-agent-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  background: rgba(15, 23, 42, 0.45);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.voice-agent-modal {
+  width: min(640px, 100%);
+  max-height: calc(100vh - 2rem);
+  background: #fff;
+  border-radius: 18px;
+  border: 1px solid var(--color-gray-200);
+  box-shadow: var(--shadow-xl);
+  overflow: auto;
+}
+
+.voice-agent-header {
+  padding: 1rem 1.2rem;
+  border-bottom: 1px solid var(--color-gray-200);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(135deg, rgba(31, 122, 77, 0.08), rgba(43, 182, 115, 0.14));
+}
+
+.voice-agent-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--color-gray-900);
+}
+
+.voice-agent-close {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 9999px;
+  color: var(--color-gray-700);
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid var(--color-gray-200);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.voice-agent-body {
+  padding: 1rem 1.2rem 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.voice-agent-status-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.voice-agent-status {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.voice-status-dot {
+  width: 0.6rem;
+  height: 0.6rem;
+  border-radius: 9999px;
+  background: var(--color-gray-400);
+}
+
+.voice-status-dot.is-listening {
+  background: var(--color-brand-accent);
+}
+
+.voice-status-dot.is-processing {
+  background: var(--color-warning);
+}
+
+.voice-status-dot.is-speaking {
+  background: var(--color-info);
+}
+
+.voice-status-dot.is-error {
+  background: var(--color-error);
+}
+
+.voice-agent-mic-wrap {
+  display: flex;
+  justify-content: center;
+  position: relative;
+  padding: 0.2rem 0 0.5rem;
+}
+
+.voice-agent-mic {
+  width: 5rem;
+  height: 5rem;
+  border-radius: 9999px;
+  background: var(--color-primary-100);
+  color: var(--color-brand-primary);
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid var(--color-primary-200);
+  z-index: 1;
+}
+
+.voice-agent-mic.active {
+  background: linear-gradient(135deg, var(--color-brand-primary), var(--color-brand-accent));
+  color: #fff;
+}
+
+.voice-agent-ring {
+  position: absolute;
+  width: 5rem;
+  height: 5rem;
+  border-radius: 9999px;
+  border: 2px solid var(--color-brand-primary);
+  animation: voiceRingPulse 1.2s ease-out infinite;
+}
+
+.voice-agent-textarea {
+  width: 100%;
+  border: 1px solid var(--color-gray-300);
+  border-radius: 10px;
+  padding: 0.7rem 0.8rem;
+  color: var(--color-gray-800);
+  resize: vertical;
+}
+
+.voice-agent-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.voice-agent-submit {
+  background: var(--color-brand-primary);
+  color: #fff;
+  border-radius: 8px;
+  font-weight: 600;
+  padding: 0.55rem 0.95rem;
+}
+
+.voice-agent-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.voice-agent-error {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  color: #b91c1c;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 10px;
+  padding: 0.65rem 0.75rem;
+  font-size: 0.875rem;
+}
+
+.voice-agent-response {
+  border: 1px solid var(--color-primary-200);
+  border-radius: 10px;
+  padding: 0.8rem;
+  background: var(--color-primary-50);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.voice-agent-response-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--color-primary-700);
+  font-weight: 700;
+}
+
+.voice-agent-metadata {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.voice-agent-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  border-radius: 9999px;
+  padding: 0.25rem 0.55rem;
+  font-size: 0.74rem;
+  background: #fff;
+  border: 1px solid var(--color-primary-200);
+  color: var(--color-gray-700);
+}
+
+@media (max-width: 768px) {
+  .voice-agent-fab {
+    right: 1rem;
+    bottom: max(1rem, env(safe-area-inset-bottom));
+    width: 3.1rem;
+    height: 3.1rem;
+  }
+}
+
 /* Scrollbar Styling */
 ::-webkit-scrollbar {
   width: 10px;

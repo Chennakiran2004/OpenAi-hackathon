@@ -413,3 +413,30 @@ export type PetroleumIntelligenceResponse = {
   strategic_recommendations: string[];
   risk_assessment: string;
 };
+
+/** ---------------- Voice agent types ---------------- */
+
+export type VoiceAgentSector = "agriculture" | "petroleum";
+
+export type VoiceAgentDomain =
+  | "agriculture"
+  | "petroleum"
+  | "unsupported";
+
+export type VoiceAgentConfidence = "low" | "medium" | "high";
+
+export type VoiceAgentRequest = {
+  sector: VoiceAgentSector;
+  transcript: string;
+  language?: string;
+  context?: string;
+  prompt_version?: string;
+};
+
+export type VoiceAgentResponse = {
+  reply_text: string;
+  confidence?: VoiceAgentConfidence | string;
+  data_timestamp?: string;
+  domain?: VoiceAgentDomain | string;
+  language?: string;
+};
