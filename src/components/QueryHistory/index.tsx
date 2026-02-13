@@ -7,6 +7,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import type { HistoryItem } from '../../api/types';
 import { formatRelativeTime, formatTonnes, formatCurrency } from '../../utils/formatters';
 import { HiSearch, HiExclamationCircle, HiClipboardList, HiClock, HiViewList, HiArrowRight } from 'react-icons/hi';
+import { showError } from '../../utils/toast';
 
 export default function QueryHistory() {
     const navigate = useNavigate();
@@ -43,7 +44,9 @@ export default function QueryHistory() {
             setHistory(data);
             setFilteredHistory(data);
         } catch (err) {
-            setError(getErrorMessage(err));
+            const errorMsg = getErrorMessage(err);
+            setError(errorMsg);
+            showError(errorMsg || 'Failed to load query history');
         } finally {
             setLoading(false);
         }

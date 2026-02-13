@@ -10,6 +10,29 @@ type LandingPageProps = {
   onSignIn: () => void;
 };
 
+// India Flag SVG Component
+const IndiaFlag = () => (
+  <svg width="40" height="28" viewBox="0 0 60 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+    {/* Saffron stripe */}
+    <rect width="60" height="13.33" fill="#FF9933" />
+    {/* White stripe */}
+    <rect y="13.33" width="60" height="13.34" fill="#FFFFFF" />
+    {/* Green stripe */}
+    <rect y="26.67" width="60" height="13.33" fill="#138808" />
+    {/* Ashoka Chakra */}
+    <circle cx="30" cy="20" r="5" fill="none" stroke="#000080" strokeWidth="0.5" />
+    {/* Chakra spokes */}
+    {Array.from({ length: 24 }).map((_, i) => {
+      const angle = (i * 15 * Math.PI) / 180;
+      const x1 = 30 + 3 * Math.cos(angle);
+      const y1 = 20 + 3 * Math.sin(angle);
+      const x2 = 30 + 5 * Math.cos(angle);
+      const y2 = 20 + 5 * Math.sin(angle);
+      return <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke="#000080" strokeWidth="0.3" />;
+    })}
+  </svg>
+);
+
 type FeatureCardProps = {
   title: string;
   description: string;
@@ -586,7 +609,9 @@ function LandingPage({
           <S.Footer>
             <S.FooterContent>
               <S.FooterBrand>
-                <S.FooterLogo>🇮🇳</S.FooterLogo>
+                <S.FooterLogo>
+                  <IndiaFlag />
+                </S.FooterLogo>
                 <S.FooterTagline>
                   <S.FooterTaglineMain>Made in India, Made for India</S.FooterTaglineMain>
                   <S.FooterTaglineSub>Building Digital India through Innovation</S.FooterTaglineSub>

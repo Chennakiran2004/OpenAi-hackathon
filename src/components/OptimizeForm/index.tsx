@@ -21,6 +21,7 @@ import {
 } from "react-icons/hi";
 import { RiTrainFill } from "react-icons/ri";
 import { FaLeaf } from "react-icons/fa";
+import { showSuccess, showError, showWarning, showInfo } from '../../utils/toast';
 
 export default function OptimizeForm() {
   const navigate = useNavigate();
@@ -104,6 +105,7 @@ export default function OptimizeForm() {
       setCrops(data);
     } catch (err) {
       console.error("Failed to load crops:", err);
+      showError('Failed to load crops. Please refresh the page.');
     } finally {
       setCropsLoading(false);
     }
@@ -116,6 +118,7 @@ export default function OptimizeForm() {
       setStates(data);
     } catch (err) {
       console.error("Failed to load states:", err);
+      showError('Failed to load states. Please try again.');
     } finally {
       setStatesLoading(false);
     }
@@ -128,6 +131,7 @@ export default function OptimizeForm() {
       setDistricts(data);
     } catch (err) {
       console.error("Failed to load districts:", err);
+      showError('Failed to load districts. Please try again.');
     } finally {
       setDistrictsLoading(false);
     }
@@ -165,6 +169,7 @@ export default function OptimizeForm() {
 
     setSubmitting(true);
     try {
+      showInfo('Finding best suppliers...');
       const result = await optimize({
         crop_id: cropId as number,
         state_id: stateId as number,
@@ -173,10 +178,13 @@ export default function OptimizeForm() {
         transport_mode: transportMode,
       });
 
+      showSuccess('Optimization complete! Redirecting to results...');
       // Navigate to results page
       navigate(`/results/${result.id}`);
     } catch (err) {
-      setError(getErrorMessage(err));
+      const errorMsg = getErrorMessage(err);
+      setError(errorMsg);
+      showError(errorMsg || 'Optimization failed. Please try again.');
     } finally {
       setSubmitting(false);
     }

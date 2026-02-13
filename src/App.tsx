@@ -34,6 +34,7 @@ import TopBar from "./components/TopBar";
 import type { VoiceAgentSector } from "./api/types";
 import AssistLauncher from "./components/AssistLauncher";
 import { appStyles as styles } from "./stylecomponent";
+import { Toaster } from 'react-hot-toast';
 
 function getDefaultPrivateRoute(): string {
   const sector = getStoredSector();
@@ -234,6 +235,17 @@ function App() {
   return (
     <AuthProvider>
       <RecruiterProvider>
+        <Toaster
+          position="bottom-right"
+          toastOptions={{
+            duration: 4000,
+            style: {
+              borderRadius: '12px',
+              fontSize: '14px',
+              fontWeight: '500',
+            },
+          }}
+        />
         <SessionRestore />
         <AppContent />
       </RecruiterProvider>

@@ -147,6 +147,27 @@ client.interceptors.request.use((config) => {
   return config;
 });
 
+// Response interceptor for global error handling
+client.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    // Handle 401 Unauthorized globally
+    if (error.response?.status === 401) {
+      const currentPath = window.location.pathname;
+      // Only show session expired toast if not already on auth page
+      if (!currentPath.includes('/auth') && !currentPath.includes('/')) {
+        // Dynamically import to avoid circular dependency
+        import('../../utils/toast').then(({ showWarning }) => {
+          showWarning('Session expired. Please login again.');
+        });
+        clearAccessToken();
+        window.location.href = '/auth?mode=signin';
+      }
+    }
+    return Promise.reject(error);
+  }
+);
+
 type ErrorData = {
   detail?: string | unknown;
   email?: string[];

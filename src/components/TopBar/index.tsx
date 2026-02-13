@@ -42,13 +42,6 @@ function TopBar({
           {!isLoggedIn && (
             <>
               <button
-                className={styles.secondaryButton}
-                type="button"
-                onClick={onSignIn}
-              >
-                Request Govt Demo
-              </button>
-              <button
                 className={styles.primaryButton}
                 type="button"
                 onClick={onSignUp}

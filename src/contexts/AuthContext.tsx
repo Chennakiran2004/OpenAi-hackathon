@@ -16,6 +16,7 @@ import {
 } from "../api/clientapi";
 import type { RegisterPayload, StoredUser, StateOption, DistrictOption } from "../api/types";
 import type { AuthMode, Role, User } from "../components/types";
+import { showSuccess, showError, showInfo } from '../utils/toast';
 
 function storedUserToUser(stored: StoredUser, role: Role): User {
   const name = stored.username;
@@ -175,9 +176,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             profile: data.profile,
           });
           setUser(storedUserToUser({ user_id: data.user_id, username: data.username, profile: data.profile }, roleChoice));
+          showSuccess(`Welcome back, ${data.username}! 👋`);
           navigate(getRouteForStoredSector(), { replace: true });
         } catch (err) {
-          setAuthError(getErrorMessage(err));
+          const errorMsg = getErrorMessage(err);
+          setAuthError(errorMsg);
+          showError(errorMsg || 'Login failed. Please try again.');
         } finally {
           setAuthLoading(false);
         }
@@ -244,10 +248,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
           setStoredUser(storedUser);
           setUser(storedUserToUser(storedUser, roleChoice));
+          showSuccess('Account created successfully! Welcome aboard! 🎉');
           clearStoredSector();
           navigate("/choose-sector", { replace: true });
         } catch (err) {
-          setAuthError(getErrorMessage(err));
+          const errorMsg = getErrorMessage(err);
+          setAuthError(errorMsg);
+          showError(errorMsg || 'Registration failed. Please try again.');
         } finally {
           setAuthLoading(false);
         }
@@ -284,6 +291,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setStateOptions([]);
     setDistrictOptions([]);
     setDesignation("");
+    showInfo('Logged out successfully');
     navigate("/");
   }, [navigate]);
 
