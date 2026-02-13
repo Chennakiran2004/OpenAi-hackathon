@@ -31,8 +31,8 @@ import DemandPrediction from "./components/DemandPrediction";
 import PetroleumSector from "./components/PetroleumSector";
 import SectorSelect from "./components/SectorSelect";
 import TopBar from "./components/TopBar";
-import VoiceAgent from "./components/VoiceAgent";
 import type { VoiceAgentSector } from "./api/types";
+import AssistLauncher from "./components/AssistLauncher";
 import { appStyles as styles } from "./stylecomponent";
 
 function getDefaultPrivateRoute(): string {
@@ -188,7 +188,7 @@ function AppContent() {
           />
         </Routes>
       </main>
-      <VoiceAgentHost />
+      <AssistLauncherHost />
     </>
   );
 }
@@ -214,7 +214,7 @@ function getVoiceAgentSectorForPath(pathname: string): VoiceAgentSector | null {
   return null;
 }
 
-function VoiceAgentHost() {
+function AssistLauncherHost() {
   const location = useLocation();
   const { user } = useAuth();
 
@@ -227,7 +227,7 @@ function VoiceAgentHost() {
     return null;
   }
 
-  return <VoiceAgent sector={sector} />;
+  return <AssistLauncher sector={sector} />;
 }
 
 function App() {

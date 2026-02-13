@@ -1,4 +1,12 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  forwardRef,
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import {
@@ -23,7 +31,13 @@ import {
 
 interface VoiceAgentProps {
   sector: VoiceAgentSector;
+  hideFab?: boolean;
 }
+
+export type VoiceAgentHandle = {
+  open: () => void;
+  close: () => void;
+};
 
 type VoiceStatus = "idle" | "listening" | "processing" | "speaking" | "error";
 
@@ -95,7 +109,10 @@ function buildMockResponse(
   };
 }
 
-export default function VoiceAgent({ sector }: VoiceAgentProps) {
+const VoiceAgent = forwardRef<VoiceAgentHandle, VoiceAgentProps>(function VoiceAgent(
+  { sector, hideFab = false }: VoiceAgentProps,
+  ref
+) {
   const recognitionRef = useRef<SpeechRecognition | null>(null);
   const triggerRef = useRef<HTMLButtonElement | null>(null);
   const modalRef = useRef<HTMLDivElement | null>(null);
@@ -121,6 +138,39 @@ export default function VoiceAgent({ sector }: VoiceAgentProps) {
     return lang;
   }, []);
 
+  function resetOutput() {
+    setReply("");
+    setConfidence("");
+    setDataTimestamp("");
+    setDomain("");
+    setErrorMessage("");
+  }
+
+  const handleOpen = useCallback(() => {
+    setIsOpen(true);
+  }, []);
+
+  const handleClose = useCallback(() => {
+    if (recognitionRef.current && status === "listening") {
+      recognitionRef.current.stop();
+    }
+    if (window.speechSynthesis) {
+      window.speechSynthesis.cancel();
+    }
+    setStatus("idle");
+    setIsOpen(false);
+    setTimeout(() => triggerRef.current?.focus(), 0);
+  }, [status]);
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      open: handleOpen,
+      close: handleClose,
+    }),
+    [handleOpen, handleClose]
+  );
+
   useEffect(() => {
     if (!isOpen) return undefined;
 
@@ -132,7 +182,7 @@ export default function VoiceAgent({ sector }: VoiceAgentProps) {
 
     document.addEventListener("keydown", onKeyDown);
     return () => document.removeEventListener("keydown", onKeyDown);
-  }, [isOpen]);
+  }, [isOpen, handleClose]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -149,30 +199,6 @@ export default function VoiceAgent({ sector }: VoiceAgentProps) {
       }
     };
   }, []);
-
-  function resetOutput() {
-    setReply("");
-    setConfidence("");
-    setDataTimestamp("");
-    setDomain("");
-    setErrorMessage("");
-  }
-
-  function handleOpen() {
-    setIsOpen(true);
-  }
-
-  function handleClose() {
-    if (recognitionRef.current && status === "listening") {
-      recognitionRef.current.stop();
-    }
-    if (window.speechSynthesis) {
-      window.speechSynthesis.cancel();
-    }
-    setStatus("idle");
-    setIsOpen(false);
-    setTimeout(() => triggerRef.current?.focus(), 0);
-  }
 
   function stopListening() {
     if (recognitionRef.current) {
@@ -290,15 +316,17 @@ export default function VoiceAgent({ sector }: VoiceAgentProps) {
 
   const content = (
     <>
-      <button
-        ref={triggerRef}
-        type="button"
-        onClick={handleOpen}
-        className="voice-agent-fab"
-        aria-label="Open voice agent"
-      >
-        <HiMicrophone className="w-6 h-6" />
-      </button>
+      {!hideFab && (
+        <button
+          ref={triggerRef}
+          type="button"
+          onClick={handleOpen}
+          className="voice-agent-fab"
+          aria-label="Open voice agent"
+        >
+          <HiMicrophone className="w-6 h-6" />
+        </button>
+      )}
 
       <AnimatePresence>
         {isOpen && (
@@ -443,4 +471,6 @@ export default function VoiceAgent({ sector }: VoiceAgentProps) {
   }
 
   return createPortal(content, document.body);
-}
+});
+
+export default VoiceAgent;
