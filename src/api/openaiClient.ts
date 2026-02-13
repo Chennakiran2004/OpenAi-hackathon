@@ -143,18 +143,35 @@ export async function queryVoiceAgentOpenAI(
     );
   }
 
+  const languageMap: { [key: string]: string } = {
+    "en-IN": "English",
+    "hi-IN": "Hindi",
+    "te-IN": "Telugu",
+    "ta-IN": "Tamil",
+    "kn-IN": "Kannada",
+    "mr-IN": "Marathi",
+    "ml-IN": "Malayalam",
+    "ur-IN": "Urdu",
+    "gu-IN": "Gujarati",
+    "pa-IN": "Punjabi",
+    "bn-IN": "Bengali",
+  };
+
+  const languageName = languageMap[params.language || "en-IN"] || "English";
+
   const instruction = [
     "Return strictly JSON object with keys:",
     "reply_text (string), confidence (low|medium|high),",
     "domain (agriculture|petroleum|unsupported), language (string),",
     "data_timestamp (ISO-8601 string).",
+    `IMPORTANT: Respond in ${languageName} language. The reply_text must be in ${languageName}.`,
     `Use "${VOICE_AGENT_MISSING_DATA_RESPONSE}" when data is unavailable.`,
     `Use "${VOICE_AGENT_UNSUPPORTED_RESPONSE}" for unsupported domains.`,
   ].join(" ");
 
   const userContext = [
     `sector: ${params.sector}`,
-    `language_hint: ${params.language || "auto"}`,
+    `response_language: ${languageName}`,
     `route_context: ${params.context || "unknown"}`,
     `prompt_version: ${params.promptVersion || "v1"}`,
     `query: ${params.transcript}`,

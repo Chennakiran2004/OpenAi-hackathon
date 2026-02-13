@@ -16,8 +16,10 @@ import {
   HiSpeakerphone,
   HiExclamationCircle,
   HiClock,
+  HiStop,
 } from "react-icons/hi";
 import { queryVoiceAgentOpenAI } from "../../api/openaiClient";
+import { transcribeAudio, isTranscriptionAvailable } from "../../api/audioTranscription";
 import type {
   VoiceAgentConfidence,
   VoiceAgentDomain,
@@ -115,6 +117,8 @@ const VoiceAgent = forwardRef<VoiceAgentHandle, VoiceAgentProps>(function VoiceA
   ref
 ) {
   const recognitionRef = useRef<SpeechRecognition | null>(null);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
   const triggerRef = useRef<HTMLButtonElement | null>(null);
   const modalRef = useRef<HTMLDivElement | null>(null);
   const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
@@ -127,17 +131,37 @@ const VoiceAgent = forwardRef<VoiceAgentHandle, VoiceAgentProps>(function VoiceA
   const [dataTimestamp, setDataTimestamp] = useState("");
   const [domain, setDomain] = useState<VoiceAgentDomain | string>("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [recordingDuration, setRecordingDuration] = useState(0);
 
   const recognitionSupported = useMemo(() => {
     if (typeof window === "undefined") return false;
     return Boolean(window.SpeechRecognition || window.webkitSpeechRecognition);
   }, []);
 
-  const selectedLanguage = useMemo(() => {
-    if (typeof navigator === "undefined") return "en-IN";
-    const lang = navigator.language || "en-IN";
-    return lang;
+  const mediaRecorderSupported = useMemo(() => {
+    if (typeof window === "undefined") return false;
+    return Boolean(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
   }, []);
+
+  const [selectedLanguage, setSelectedLanguage] = useState<string>("en-IN");
+
+  const languageOptions = [
+    { value: "en-IN", label: "English", speechLang: "en-IN" },
+    { value: "hi-IN", label: "हिन्दी (Hindi)", speechLang: "hi-IN" },
+    { value: "te-IN", label: "తెలుగు (Telugu)", speechLang: "te-IN" },
+    { value: "ta-IN", label: "தமிழ் (Tamil)", speechLang: "ta-IN" },
+    { value: "kn-IN", label: "ಕನ್ನಡ (Kannada)", speechLang: "kn-IN" },
+    { value: "mr-IN", label: "मराठी (Marathi)", speechLang: "mr-IN" },
+    { value: "ml-IN", label: "മലയാളം (Malayalam)", speechLang: "ml-IN" },
+    { value: "ur-IN", label: "اردو (Urdu)", speechLang: "ur-IN" },
+    { value: "gu-IN", label: "ગુજરાતી (Gujarati)", speechLang: "gu-IN" },
+    { value: "pa-IN", label: "ਪੰਜਾਬੀ (Punjabi)", speechLang: "pa-IN" },
+    { value: "bn-IN", label: "বাংলা (Bengali)", speechLang: "bn-IN" },
+  ];
+
+  function getLanguageOption(langCode: string) {
+    return languageOptions.find(opt => opt.value === langCode);
+  }
 
   function resetOutput() {
     setReply("");
@@ -154,6 +178,12 @@ const VoiceAgent = forwardRef<VoiceAgentHandle, VoiceAgentProps>(function VoiceA
   const handleClose = useCallback(() => {
     if (recognitionRef.current && status === "listening") {
       recognitionRef.current.stop();
+    }
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== "inactive") {
+      mediaRecorderRef.current.stop();
+      // Stop all media tracks
+      const stream = mediaRecorderRef.current.stream;
+      stream.getTracks().forEach(track => track.stop());
     }
     if (window.speechSynthesis) {
       window.speechSynthesis.cancel();
@@ -195,84 +225,208 @@ const VoiceAgent = forwardRef<VoiceAgentHandle, VoiceAgentProps>(function VoiceA
       if (recognitionRef.current) {
         recognitionRef.current.abort();
       }
+      if (mediaRecorderRef.current) {
+        mediaRecorderRef.current.stop();
+      }
       if (window.speechSynthesis && utteranceRef.current) {
         window.speechSynthesis.cancel();
       }
     };
   }, []);
 
-  function stopListening() {
-    if (recognitionRef.current) {
-      recognitionRef.current.stop();
+  // Recording duration timer
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (status === "listening") {
+      setRecordingDuration(0);
+      interval = setInterval(() => {
+        setRecordingDuration((prev) => prev + 1);
+      }, 1000);
     }
-    setStatus("idle");
+    return () => clearInterval(interval);
+  }, [status]);
+
+  async function stopRecording() {
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== "inactive") {
+      mediaRecorderRef.current.stop();
+    }
   }
 
-  function startListening() {
+  async function startRecording() {
     resetOutput();
+    setRecordingDuration(0);
 
-    if (!recognitionSupported) {
-      setStatus("error");
-      setErrorMessage(
-        "Speech recognition is not supported in this browser. Please type your query."
-      );
-      return;
-    }
+    // Check if OpenAI transcription is available
+    const useOpenAITranscription = isTranscriptionAvailable() && mediaRecorderSupported;
 
-    const SpeechRecognitionClass =
-      window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SpeechRecognitionClass) return;
+    if (useOpenAITranscription) {
+      // Use OpenAI transcription with MediaRecorder
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
 
-    const recognition = new SpeechRecognitionClass();
-    recognition.continuous = false;
-    recognition.interimResults = false;
-    recognition.lang = selectedLanguage;
+        // Try to use webm first, fallback to other formats
+        const mimeType = MediaRecorder.isTypeSupported('audio/webm')
+          ? 'audio/webm'
+          : MediaRecorder.isTypeSupported('audio/mp4')
+            ? 'audio/mp4'
+            : 'audio/wav';
 
-    recognition.onresult = (event: SpeechRecognitionEvent) => {
-      const parts: string[] = [];
-      for (let index = 0; index < event.results.length; index += 1) {
-        const result = event.results[index];
-        if (result?.[0]?.transcript) {
-          parts.push(result[0].transcript);
+        const mediaRecorder = new MediaRecorder(stream, { mimeType });
+        audioChunksRef.current = [];
+
+        mediaRecorder.ondataavailable = (event) => {
+          if (event.data.size > 0) {
+            audioChunksRef.current.push(event.data);
+          }
+        };
+
+        mediaRecorder.onstop = async () => {
+          // Stop all tracks
+          stream.getTracks().forEach(track => track.stop());
+
+          if (audioChunksRef.current.length === 0) {
+            setStatus("error");
+            setErrorMessage("No audio was recorded. Please try again.");
+            return;
+          }
+
+          // Create blob from recorded chunks
+          const audioBlob = new Blob(audioChunksRef.current, { type: mimeType });
+
+          // Transcribe using OpenAI
+          setStatus("processing");
+          try {
+            const result = await transcribeAudio({
+              audioBlob,
+              language: selectedLanguage,
+              sector,
+            });
+
+            if (result.text.trim()) {
+              setTranscript(result.text);
+              submitTranscript(result.text);
+            } else {
+              setStatus("error");
+              setErrorMessage("No speech detected in the recording.");
+            }
+          } catch (error) {
+            setStatus("error");
+            const message =
+              error instanceof Error
+                ? error.message
+                : "Failed to transcribe audio. Please try again.";
+            setErrorMessage(message);
+          }
+        };
+
+        mediaRecorder.onerror = () => {
+          setStatus("error");
+          setErrorMessage("Error recording audio. Please check microphone permissions.");
+        };
+
+        mediaRecorderRef.current = mediaRecorder;
+        setStatus("listening");
+        mediaRecorder.start();
+      } catch (error) {
+        setStatus("error");
+        const message =
+          error instanceof Error && error.name === "NotAllowedError"
+            ? "Microphone access denied. Please allow microphone access and try again."
+            : "Unable to access microphone. Please check your settings.";
+        setErrorMessage(message);
+      }
+    } else {
+      // Fallback to browser SpeechRecognition
+      if (!recognitionSupported) {
+        setStatus("error");
+        setErrorMessage(
+          "Speech recognition is not supported. Please type your query."
+        );
+        return;
+      }
+
+      const SpeechRecognitionClass =
+        window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognitionClass) return;
+
+      const recognition = new SpeechRecognitionClass();
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      recognition.lang = selectedLanguage;
+
+      recognition.onresult = (event: SpeechRecognitionEvent) => {
+        const parts: string[] = [];
+        for (let index = 0; index < event.results.length; index += 1) {
+          const result = event.results[index];
+          if (result?.[0]?.transcript) {
+            parts.push(result[0].transcript);
+          }
         }
-      }
-      const finalTranscript = parts.join(" ").trim();
-      if (finalTranscript) {
-        setTranscript(finalTranscript);
-        submitTranscript(finalTranscript);
-      }
-    };
+        const finalTranscript = parts.join(" ").trim();
+        if (finalTranscript) {
+          setTranscript(finalTranscript);
+          submitTranscript(finalTranscript);
+        }
+      };
 
-    recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
-      setStatus("error");
-      setErrorMessage(event.message || "Unable to capture voice input.");
-    };
+      recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
+        setStatus("error");
+        setErrorMessage(event.message || "Unable to capture voice input.");
+      };
 
-    recognition.onend = () => {
-      setStatus((current) => (current === "listening" ? "idle" : current));
-    };
+      recognition.onend = () => {
+        setStatus((current) => (current === "listening" ? "idle" : current));
+      };
 
-    recognitionRef.current = recognition;
-    setStatus("listening");
-    recognition.start();
+      recognitionRef.current = recognition;
+      setStatus("listening");
+      recognition.start();
+    }
   }
 
-  function speak(text: string, language?: string): boolean {
+  function speak(text: string, responseLang?: string): boolean {
     if (typeof window === "undefined" || !window.speechSynthesis) return false;
 
     window.speechSynthesis.cancel();
+
+    // Map response language name back to language code
+    let speechLang = selectedLanguage;
+    if (responseLang) {
+      // Find matching language option by comparing language names
+      const langOption = languageOptions.find(opt =>
+        opt.label.toLowerCase().includes(responseLang.toLowerCase())
+      );
+      if (langOption) {
+        speechLang = langOption.speechLang;
+      }
+    }
+
     const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = language || selectedLanguage;
+    utterance.lang = speechLang;
     utterance.rate = 1;
     utterance.pitch = 1;
 
     utterance.onstart = () => setStatus("speaking");
-    utterance.onend = () => setStatus("idle");
-    utterance.onerror = () => setStatus("idle");
+    utterance.onend = () => {
+      setStatus("idle");
+      setRecordingDuration(0);
+    };
+    utterance.onerror = () => {
+      setStatus("idle");
+      setRecordingDuration(0);
+    };
 
     utteranceRef.current = utterance;
     window.speechSynthesis.speak(utterance);
     return true;
+  }
+
+  function stopSpeaking() {
+    if (window.speechSynthesis) {
+      window.speechSynthesis.cancel();
+    }
+    setStatus("idle");
+    setRecordingDuration(0);
   }
 
   async function submitTranscript(text: string) {
@@ -386,7 +540,11 @@ const VoiceAgent = forwardRef<VoiceAgentHandle, VoiceAgentProps>(function VoiceA
                         }`}
                     />
                     <span className="text-sm font-semibold text-gray-700 capitalize">
-                      {status}
+                      {status === "processing" && recordingDuration > 0
+                        ? "Transcribing"
+                        : status === "listening"
+                          ? "Recording"
+                          : status}
                     </span>
                   </div>
                   <p className="text-xs text-gray-500">
@@ -394,20 +552,78 @@ const VoiceAgent = forwardRef<VoiceAgentHandle, VoiceAgentProps>(function VoiceA
                   </p>
                 </div>
 
+                {/* Language Selector */}
+                <div style={{ marginBottom: '1rem' }}>
+                  <label
+                    htmlFor="language-select"
+                    style={{
+                      display: 'block',
+                      fontSize: '0.75rem',
+                      fontWeight: 600,
+                      color: 'var(--color-gray-700)',
+                      marginBottom: '0.5rem',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.05em'
+                    }}
+                  >
+                    Response Language
+                  </label>
+                  <select
+                    id="language-select"
+                    value={selectedLanguage}
+                    onChange={(e) => setSelectedLanguage(e.target.value)}
+                    disabled={status === "listening" || status === "processing" || status === "speaking"}
+                    style={{
+                      width: '100%',
+                      padding: '0.6rem 0.75rem',
+                      border: '1px solid var(--color-gray-300)',
+                      borderRadius: '8px',
+                      fontSize: '0.875rem',
+                      fontWeight: 500,
+                      color: 'var(--color-gray-800)',
+                      backgroundColor: '#fff',
+                      cursor: status === "listening" || status === "processing" || status === "speaking" ? 'not-allowed' : 'pointer',
+                      opacity: status === "listening" || status === "processing" || status === "speaking" ? 0.6 : 1
+                    }}
+                  >
+                    {languageOptions.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
                 <div className="voice-agent-mic-wrap">
-                  {status !== "speaking" && (
+                  {status === "speaking" ? (
+                    <button
+                      type="button"
+                      onClick={stopSpeaking}
+                      className="voice-agent-mic active"
+                      aria-label="Stop speaking"
+                      style={{
+                        backgroundColor: 'var(--color-error)',
+                        borderColor: 'var(--color-error)'
+                      }}
+                    >
+                      <HiStop className="w-9 h-9" />
+                    </button>
+                  ) : (
                     <button
                       type="button"
                       onClick={
-                        status === "listening" ? stopListening : startListening
+                        status === "listening" ? stopRecording : startRecording
                       }
                       className={`voice-agent-mic ${status === "listening" ? "active" : ""}`}
+                      aria-label={status === "listening" ? "Stop recording" : "Start recording"}
                     >
                       <HiMicrophone className="w-9 h-9" />
                     </button>
                   )}
                   {status === "listening" && (
-                    <div className="voice-agent-ring" aria-hidden="true" />
+                    <>
+                      <div className="voice-agent-ring" aria-hidden="true" />
+                    </>
                   )}
                   {(status === "listening" || status === "speaking") && (
                     <div className="voice-agent-lottie-wrap">

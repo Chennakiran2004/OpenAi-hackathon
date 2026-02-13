@@ -34,14 +34,14 @@ function TopBar({
                 type="button"
                 onClick={onSignIn}
               >
-                View Sandbox
+                Request Govt Demo
               </button>
               <button
                 className={styles.primaryButton}
                 type="button"
                 onClick={onSignUp}
               >
-                Request Demo
+                Explore Platform
               </button>
             </>
           )}
