@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
+import { RiSeedlingFill } from "react-icons/ri";
 import * as S from "./stylecomponent";
 import { ButtonsContainer } from "./stylecomponent";
 
@@ -154,11 +155,24 @@ function Hero({
       <S.BorderBottom />
 
       <S.HeroContentNew>
-        <S.HeroBadge>
-          <S.BadgeDot />
-          National Data Intelligence Platform
-        </S.HeroBadge>
+        {/* Logo */}
+        <div className="flex flex-col items-center">
+          <S.LogoContainer
+            as={motion.div}
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+          >
+            <S.LogoIcon>
+              <RiSeedlingFill />
+            </S.LogoIcon>
+          </S.LogoContainer>
 
+          <S.HeroBadge>
+            <S.BadgeDot />
+            India's First National Data Intelligence Platform
+          </S.HeroBadge>
+        </div>
         <S.HeroTitleNew>
           {words.map((word, index) => (
             <motion.span
@@ -188,18 +202,16 @@ function Hero({
           of intelligent decision-making
         </S.HeroSubtitleNew>
 
+
         <S.CTAGroupNew
           as={motion.div}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.3, delay: 1.4 }}
         >
-          <S.ButtonPrimary type="button" onClick={onPrimaryClick}>
-            Request Government Demo
-          </S.ButtonPrimary>
-          <S.ButtonSecondary type="button" onClick={onSecondaryClick}>
+          <S.ButtonPrimary type="button" onClick={onSecondaryClick}>
             Explore Platform
-          </S.ButtonSecondary>
+          </S.ButtonPrimary>
         </S.CTAGroupNew>
 
         <S.SignInRowNew
@@ -356,26 +368,32 @@ function LandingPage({
   const targetUsers = [
     {
       title: "Ministry of Agriculture",
+      icon: "🌾",
       description: "Instant commodity sourcing, automated transport cost comparison, real-time price monitoring, AI-driven crop advisories for faster policy decisions",
     },
     {
       title: "Ministry of Petroleum & Natural Gas",
+      icon: "⛽",
       description: "Unified crude production tracking, refinery monitoring, trade balance analysis, AI-powered import bill forecasting",
     },
     {
       title: "State Procurement Agencies",
+      icon: "🏪",
       description: "Quickly locate surplus stock in other states, compare rail vs road freight costs, make procurement decisions in minutes",
     },
     {
       title: "Food Corporation of India (FCI)",
+      icon: "🌽",
       description: "Data-driven grain movement planning, optimal route selection, demand-supply gap identification across regions",
     },
     {
       title: "NITI Aayog / Policy Think Tanks",
+      icon: "💡",
       description: "Cross-sector intelligence combining agriculture and energy data for national planning, budget allocation, strategic policy design",
     },
     {
       title: "Finance Ministry / RBI",
+      icon: "💵",
       description: "Petroleum import bill forecasting for forex reserve planning and current account deficit management",
     },
   ];
@@ -510,7 +528,7 @@ function LandingPage({
                 {targetUsers.map((user, index) => (
                   <AnimatedSection key={user.title} delay={index * 0.1}>
                     <S.FeatureCard $isVisible={true} $delay={0}>
-                      <S.FeatureIcon>🏛️</S.FeatureIcon>
+                      <S.FeatureIcon>{user.icon}</S.FeatureIcon>
                       <S.FeatureTitle>{user.title}</S.FeatureTitle>
                       <S.FeatureBody>{user.description}</S.FeatureBody>
                     </S.FeatureCard>
@@ -557,15 +575,29 @@ function LandingPage({
                 agriculture and petroleum sectors.
               </S.CTADescription>
               <ButtonsContainer>
-                <S.CTAButton type="button" onClick={onRequestDemo}>
-                  Request Government Pilot
+                <S.CTAButton type="button" onClick={onViewSandbox}>
+                  Explore Platform
                 </S.CTAButton>
-                <S.ButtonSecondary type="button" onClick={onViewSandbox}>
-                  Explore Platform Demo
-                </S.ButtonSecondary>
               </ButtonsContainer>
             </S.CTASection>
           </AnimatedSection>
+
+          {/* Footer */}
+          <S.Footer>
+            <S.FooterContent>
+              <S.FooterBrand>
+                <S.FooterLogo>🇮🇳</S.FooterLogo>
+                <S.FooterTagline>
+                  <S.FooterTaglineMain>Made in India, Made for India</S.FooterTaglineMain>
+                  <S.FooterTaglineSub>Building Digital India through Innovation</S.FooterTaglineSub>
+                </S.FooterTagline>
+              </S.FooterBrand>
+              <S.FooterDivider />
+              <S.FooterCopyright>
+                © 2026 Bharat National Intelligence Platform. Powered by Government of India.
+              </S.FooterCopyright>
+            </S.FooterContent>
+          </S.Footer>
         </S.Container>
       </S.Page>
     </>

@@ -147,11 +147,12 @@ type AnimatedSectionProps = {
 export const AnimatedSection = styled.div<AnimatedSectionProps>`
   opacity: ${(props) => (props.$isVisible ? 1 : 0)};
   transform: ${(props) =>
-    props.$isVisible ? "translateY(0)" : "translateY(30px)"};
+    props.$isVisible ? "translateY(0)" : "translateY(40px)"};
   transition:
-    opacity 0.8s ease-out,
-    transform 0.8s ease-out;
+    opacity 1s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 1s cubic-bezier(0.4, 0, 0.2, 1);
   transition-delay: ${(props) => `${props.$delay || 0}s`};
+  will-change: opacity, transform;
 `;
 
 // Hero Section
@@ -177,11 +178,12 @@ export const HeroSectionNew = styled.section`
   position: relative;
   max-width: 1280px;
   margin: 2.5rem auto 6rem;
+  margin-top:0px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 2.5rem 1rem;
+  padding: 0rem 1rem;
 
   @media (max-width: 768px) {
     padding: 1.5rem 1rem;
@@ -264,10 +266,57 @@ export const HeroContentNew = styled.div`
   z-index: 10;
   width: 100%;
   text-align: center;
-  padding: 2.5rem 0;
+  padding-bottom: 2.5rem;
 
   @media (max-width: 768px) {
-    padding: 1.5rem 0;
+    padding-bottom: 1.5rem;
+  }
+`;
+
+// Logo Styles
+export const LogoContainer = styled.div`
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 2rem;
+`;
+
+export const LogoIcon = styled.div`
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(
+    135deg,
+    var(--color-brand-primary),
+    var(--color-brand-accent)
+  );
+  border-radius: 20px;
+  box-shadow: 
+    0 10px 25px rgba(31, 122, 77, 0.3),
+    0 4px 10px rgba(43, 182, 115, 0.2);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+  svg {
+    color: white;
+    font-size: 3rem;
+  }
+
+  &:hover {
+    transform: translateY(-4px) scale(1.05);
+    box-shadow: 
+      0 15px 35px rgba(31, 122, 77, 0.4),
+      0 6px 15px rgba(43, 182, 115, 0.3);
+  }
+
+  @media (max-width: 768px) {
+    width: 64px;
+    height: 64px;
+    
+    svg {
+      font-size: 2.5rem;
+    }
   }
 `;
 
@@ -787,39 +836,98 @@ type FeatureCardProps = {
 };
 
 export const FeatureCard = styled.article<FeatureCardProps>`
+  position: relative;
   background: var(--tf-bg-surface);
   border: 1px solid var(--tf-border-subtle);
-  border-radius: 16px;
-  padding: 2rem;
-  transition: all 0.3s ease;
-  box-shadow: var(--tf-shadow-sm);
+  border-radius: 20px;
+  padding: 2.5rem 2rem;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   opacity: ${(props) => (props.$isVisible ? 1 : 0)};
   transform: ${(props) =>
-    props.$isVisible ? "translateY(0)" : "translateY(20px)"};
+    props.$isVisible ? "translateY(0)" : "translateY(30px)"};
   transition:
-    opacity 0.6s ease,
-    transform 0.6s ease;
+    opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.8s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.3s ease,
+    border-color 0.3s ease;
   transition-delay: ${(props) => `${props.$delay || 0}s`};
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(
+      90deg,
+      var(--color-brand-primary),
+      var(--color-brand-accent)
+    );
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
 
   &:hover {
-    transform: translateY(-4px);
-    box-shadow: var(--tf-shadow-md);
-    border-color: var(--tf-accent);
-    background: var(--tf-bg-surface);
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 12px 24px rgba(31, 122, 77, 0.15);
+    border-color: var(--color-brand-accent);
+    background: linear-gradient(
+      135deg,
+      var(--tf-bg-surface) 0%,
+      rgba(43, 182, 115, 0.02) 100%
+    );
+
+    &::before {
+      transform: scaleX(1);
+    }
   }
 `;
 
 export const FeatureIcon = styled.div`
-  font-size: 2rem;
-  margin-bottom: 1rem;
-  display: inline-block;
+  width: 72px;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.25rem;
+  margin-bottom: 1.5rem;
+  background: linear-gradient(
+    135deg,
+    rgba(43, 182, 115, 0.1),
+    rgba(31, 122, 77, 0.05)
+  );
+  border: 2px solid rgba(43, 182, 115, 0.2);
+  border-radius: 16px;
+  transition: all 0.3s ease;
+
+  ${FeatureCard}:hover & {
+    background: linear-gradient(
+      135deg,
+      var(--color-brand-accent),
+      var(--color-brand-primary)
+    );
+    border-color: var(--color-brand-accent);
+    transform: scale(1.1) rotate(5deg);
+    box-shadow: 0 8px 16px rgba(43, 182, 115, 0.3);
+  }
 `;
 
 export const FeatureTitle = styled.h3`
-  font-size: 1.25rem;
+  font-size: 1.375rem;
   font-weight: 700;
   color: var(--tf-text-primary);
-  margin: 0 0 0.75rem 0;
+  margin: 0 0 1rem 0;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+  transition: color 0.3s ease;
+
+  ${FeatureCard}:hover & {
+    color: var(--color-brand-primary);
+  }
 `;
 
 export const FeatureBody = styled.p`
@@ -827,6 +935,11 @@ export const FeatureBody = styled.p`
   line-height: 1.7;
   color: var(--tf-text-secondary);
   margin: 0;
+  transition: color 0.3s ease;
+
+  ${FeatureCard}:hover & {
+    color: var(--tf-text-primary);
+  }
 `;
 
 // CTA Section
@@ -926,4 +1039,93 @@ export const ButtonsContainer = styled.div`
   gap: 1rem;
 `;
 
-// New minimal hero overlay layout
+// Footer Styles
+export const Footer = styled.footer`
+  margin-top: 6rem;
+  padding: 3rem 0 2rem;
+  border-top: 1px solid var(--tf-border-subtle);
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    var(--tf-bg-soft) 100%
+  );
+`;
+
+export const FooterContent = styled.div`
+  max-width: 800px;
+  margin: 0 auto;
+  text-align: center;
+`;
+
+export const FooterBrand = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+`;
+
+export const FooterLogo = styled.div`
+  font-size: 4rem;
+  line-height: 1;
+  filter: drop-shadow(0 4px 8px rgba(43, 182, 115, 0.2));
+  animation: ${float} 6s ease-in-out infinite;
+`;
+
+export const FooterTagline = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+`;
+
+export const FooterTaglineMain = styled.div`
+  font-size: 1.5rem;
+  font-weight: 800;
+  background: linear-gradient(
+    135deg,
+    var(--color-brand-primary),
+    var(--color-brand-accent),
+    #FF9933,
+    #138808
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: ${gradientShift} 5s ease infinite;
+  letter-spacing: -0.02em;
+
+  @media (max-width: 768px) {
+    font-size: 1.25rem;
+  }
+`;
+
+export const FooterTaglineSub = styled.div`
+  font-size: 0.9375rem;
+  color: var(--tf-text-secondary);
+  font-weight: 500;
+`;
+
+export const FooterDivider = styled.div`
+  height: 1px;
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto 1.5rem;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--tf-border-medium),
+    transparent
+  );
+`;
+
+export const FooterCopyright = styled.div`
+  font-size: 0.875rem;
+  color: var(--tf-text-muted);
+  font-weight: 400;
+  line-height: 1.6;
+
+  @media (max-width: 768px) {
+    font-size: 0.8125rem;
+  }
+`;

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { topBarStyles as styles } from "./stylecomponent";
 
 type TopBarProps = {
@@ -16,8 +16,19 @@ function TopBar({
   onSignUp,
   onLogout,
 }: TopBarProps) {
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   return (
-    <header className={styles.header} style={{ backgroundColor: "#F5F7FA" }}>
+    <header className={`${styles.header} ${scrolled ? styles.headerScrolled : ''}`}>
       <nav className={styles.navbar} aria-label="Primary">
         <button
           type="button"
@@ -28,22 +39,13 @@ function TopBar({
         </button>
         <div className={styles.actions}>
           {!isLoggedIn && (
-            <>
-              <button
-                className={styles.secondaryButton}
-                type="button"
-                onClick={onSignIn}
-              >
-                Request Govt Demo
-              </button>
-              <button
-                className={styles.primaryButton}
-                type="button"
-                onClick={onSignUp}
-              >
-                Explore Platform
-              </button>
-            </>
+            <button
+              className={styles.primaryButton}
+              type="button"
+              onClick={onSignUp}
+            >
+              Explore Platform
+            </button>
           )}
           {isLoggedIn && (
             <button

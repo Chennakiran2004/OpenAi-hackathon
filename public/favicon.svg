@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="greenGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1F7A4D;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#2BB673;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background rounded square -->
+  <rect width="100" height="100" rx="20" fill="url(#greenGradient)"/>
+  
+  <!-- Seedling icon (simplified) -->
+  <g fill="white">
+    <!-- Stem -->
+    <rect x="47" y="40" width="6" height="35" rx="3"/>
+    
+    <!-- Left leaf -->
+    <ellipse cx="35" cy="45" rx="15" ry="10" transform="rotate(-30 35 45)"/>
+    
+    <!-- Right leaf -->
+    <ellipse cx="65" cy="35" rx="15" ry="10" transform="rotate(30 65 35)"/>
+    
+    <!-- Small sprout -->
+    <ellipse cx="50" cy="28" rx="8" ry="6"/>
+  </g>
+</svg>

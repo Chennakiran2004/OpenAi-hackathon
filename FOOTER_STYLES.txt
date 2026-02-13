@@ -1,0 +1,91 @@
+// Footer styles to be added to stylecomponent.ts
+
+export const Footer = styled.footer`
+  margin-top: 6rem;
+  padding: 3rem 0 2rem;
+  border-top: 1px solid var(--tf-border-subtle);
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    var(--tf-bg-soft) 100%
+  );
+`;
+
+export const FooterContent = styled.div`
+  max-width: 800px;
+  margin: 0 auto;
+  text-align: center;
+`;
+
+export const FooterBrand = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+`;
+
+export const FooterLogo = styled.div`
+  font-size: 4rem;
+  line-height: 1;
+  filter: drop-shadow(0 4px 8px rgba(43, 182, 115, 0.2));
+  animation: ${float} 6s ease-in-out infinite;
+`;
+
+export const FooterTagline = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+`;
+
+export const FooterTaglineMain = styled.div`
+  font-size: 1.5rem;
+  font-weight: 800;
+  background: linear-gradient(
+    135deg,
+    var(--color-brand-primary),
+    var(--color-brand-accent),
+    #FF9933,
+    #138808
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: ${gradientShift} 5s ease infinite;
+  letter-spacing: -0.02em;
+
+  @media (max-width: 768px) {
+    font-size: 1.25rem;
+  }
+`;
+
+export const FooterTaglineSub = styled.div`
+  font-size: 0.9375rem;
+  color: var(--tf-text-secondary);
+  font-weight: 500;
+`;
+
+export const FooterDivider = styled.div`
+  height: 1px;
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto 1.5rem;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--tf-border-medium),
+    transparent
+  );
+`;
+
+export const FooterCopyright = styled.div`
+  font-size: 0.875rem;
+  color: var(--tf-text-muted);
+  font-weight: 400;
+  line-height: 1.6;
+
+  @media (max-width: 768px) {
+    font-size: 0.8125rem;
+  }
+`;
