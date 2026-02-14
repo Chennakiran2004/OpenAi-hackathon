@@ -414,6 +414,61 @@ export type PetroleumIntelligenceResponse = {
   risk_assessment: string;
 };
 
+/** ---------------- Carbon credit sector types ---------------- */
+
+export type CarbonEmissionRequest = {
+  state: string;
+};
+
+export type CarbonEmissionResponse = {
+  state: string;
+  coalConsumed: number;
+  emission: number;
+};
+
+export type CarbonSubmitCoalDataResponse = {
+  success: boolean;
+  state: string;
+  coalConsumed: number;
+  emission: number;
+};
+
+export type CarbonUpdateEmissionRequest = {
+  industryAddress: string;
+  emission: number;
+};
+
+export type CarbonUpdateEmissionResponse = {
+  success: boolean;
+  txHash: string;
+};
+
+export type CarbonTokenBalanceResponse = {
+  balance: string;
+};
+
+export type CarbonIndustryStatus = "SURPLUS" | "DEFICIT" | string;
+
+export type CarbonIndustryDetailsResponse = {
+  wallet: string;
+  name: string;
+  state: string;
+  cap: string;
+  totalEmission: string;
+  status: CarbonIndustryStatus;
+  difference: string;
+};
+
+export type CarbonUploadGovtDataResponse = {
+  success: boolean;
+  totalRecords: number;
+  data: Array<{
+    industryAddress: string;
+    coalConsumed: number;
+    calculatedEmission: number;
+  }>;
+};
+
 /** ---------------- Voice agent types ---------------- */
 
 export type VoiceAgentSector = "agriculture" | "petroleum";

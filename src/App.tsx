@@ -29,6 +29,7 @@ import QueryHistory from "./components/QueryHistory";
 import ImpactDashboard from "./components/ImpactDashboard";
 import DemandPrediction from "./components/DemandPrediction";
 import PetroleumSector from "./components/PetroleumSector";
+import CarbonCreditSector from "./components/CarbonCreditSector";
 import SectorSelect from "./components/SectorSelect";
 import TopBar from "./components/TopBar";
 import type { VoiceAgentSector } from "./api/types";
@@ -39,6 +40,7 @@ import { Toaster } from 'react-hot-toast';
 function getDefaultPrivateRoute(): string {
   const sector = getStoredSector();
   if (sector === "petroleum") return "/petroleum/dashboard";
+  if (sector === "carbon-credit") return "/carbon-credit/dashboard";
   if (sector === "agriculture") return "/dashboard";
   return "/choose-sector";
 }
@@ -162,6 +164,22 @@ function AppContent() {
           <Route
             path="/petroleum/:tab"
             element={!user ? <Navigate to="/" replace /> : <PetroleumSector />}
+          />
+          <Route
+            path="/carbon-credit"
+            element={
+              !user ? (
+                <Navigate to="/" replace />
+              ) : (
+                <Navigate to="/carbon-credit/dashboard" replace />
+              )
+            }
+          />
+          <Route
+            path="/carbon-credit/:tab"
+            element={
+              !user ? <Navigate to="/" replace /> : <CarbonCreditSector />
+            }
           />
           <Route
             path="/profile"

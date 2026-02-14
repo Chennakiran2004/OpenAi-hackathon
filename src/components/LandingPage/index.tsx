@@ -168,7 +168,7 @@ function Hero({
   onSignIn: () => void;
 }) {
   const titleText =
-    "Bharat Krishi Setu: AI-Driven Planning for Agriculture & Petroleum";
+    "Bharat Krishi Setu: AI-Driven Planning for Agriculture, Petroleum & Carbon Credit";
   const words = titleText.split(" ");
 
   return (
@@ -220,9 +220,9 @@ function Hero({
           animate={{ opacity: 1 }}
           transition={{ duration: 0.3, delay: 1.2 }}
         >
-          Transforming scattered government data across agriculture and petroleum into real-time insights,
-          automated sourcing, and predictive analytics—replacing weeks of manual effort with seconds
-          of intelligent decision-making
+          Transforming scattered government data across agriculture, petroleum, and carbon compliance into
+          real-time insights, automated workflows, and predictive analytics, replacing weeks of manual
+          effort with seconds of decision-ready intelligence.
         </S.HeroSubtitleNew>
 
 
@@ -261,8 +261,8 @@ function LandingPage({
   const metrics = [
     { stat: "$150B", label: "Annual Import Bill Tracked", sublabel: "Petroleum sector monitoring" },
     { stat: "95%", label: "Time Reduction", sublabel: "Weeks to minutes" },
-    { stat: "10,000+", label: "Records Synced", sublabel: "Live government data" },
-    { stat: "2 Sectors", label: "Unified Platform", sublabel: "Agriculture & Petroleum" },
+    { stat: "10,000+", label: "Records Synced", sublabel: "Govt datasets + compliance logs" },
+    { stat: "3 Sectors", label: "Unified Platform", sublabel: "Agriculture • Petroleum • Carbon Credit" },
   ];
 
   const problemStatements = [
@@ -285,10 +285,52 @@ function LandingPage({
         "Critical government data exists in incompatible formats across scattered websites—months as strings vs integers, mixed units, different date formats—requiring manual cleanup before any analysis.",
     },
     {
-      title: "No Transport Cost Intelligence",
-      icon: "🚛",
+      title: "Carbon: Emissions Without Transparency",
+      icon: "♻️",
       description:
-        "Comparing railway freight vs road transport costs is done manually for every route with no automated tool to find the cheapest option, resulting in crores wasted annually on uninformed transport choices.",
+        "Coal-based industries report emissions periodically with limited audit trails. State authorities lack a transparent system for caps, surplus/deficit tracking, and controlled intra-state carbon credit balancing.",
+    },
+  ];
+
+  const carbonComplianceCards = [
+    {
+      title: "Problem Statement",
+      icon: "🏭",
+      description:
+        "Emission data is centralized and fragmented. Industries report emissions manually or periodically with limited transparency and auditability. There is no state-bound digital infrastructure to track industry-wise coal emissions, allocate caps, and enable controlled intra-state credit balancing.",
+    },
+    {
+      title: "Solution: Blockchain-Based State Carbon Compliance",
+      icon: "⛓️",
+      description:
+        "Use real government coal consumption datasets to compute CO₂ using scientific emission factors. Allocate each industry a carbon cap within its state. Surplus credits trade only within the same state. Interstate trading is restricted to State Authority wallets. All transactions are stored on-chain for transparency.",
+    },
+    {
+      title: "Controlled Credit Exchange",
+      icon: "⚖️",
+      description:
+        "A tamper-proof, state-level compliance layer aligned with evolving carbon-market policies: clear audit trails, state-bound balancing, and regulator-controlled interstate actions.",
+    },
+  ];
+
+  const carbonMethodologyCards = [
+    {
+      title: "IPCC (What it is)",
+      icon: "🌍",
+      description:
+        "Intergovernmental Panel on Climate Change (IPCC) is a UN scientific body. It does not make laws; it publishes climate science, calculation guidelines, and standard emission factors used worldwide. India aligns national inventories with IPCC methodology.",
+    },
+    {
+      title: "Emission Factor",
+      icon: "🧪",
+      description:
+        "A scientific multiplier that estimates how much CO₂ is released when a fuel is burned. Using standard factors keeps calculations consistent, explainable, and auditable across industries and states.",
+    },
+    {
+      title: "Why ~2.42 tCO₂ per ton of coal",
+      icon: "⚗️",
+      description:
+        "From combustion chemistry and real-world coal characteristics. Pure carbon yields ~3.67 tCO₂ per ton carbon (44/12), but coal contains moisture and ash with lower calorific value. Practical factors fall ~2.2–2.5; this MVP uses an IPCC-aligned average of ~2.42 tCO₂/ton.",
     },
   ];
 
@@ -360,10 +402,10 @@ function LandingPage({
         "Run sync commands repeatedly with zero duplicates. Selective sync flags allow refreshing individual datasets without touching others—safe, granular data management.",
     },
     {
-      title: "Scalable Sector-Agnostic Design",
-      icon: "🧩",
+      title: "State Carbon Cap & Credit Balancing",
+      icon: "✅",
       description:
-        "Shared DataGovClient, OpenAIService, and API framework mean adding coal, power, or railways is plugging in new data sources—not rebuilding the entire platform.",
+        "Allocate caps, compute emissions from government coal consumption data, and enable controlled intra-state credit balancing with blockchain-backed traceability and audit-ready records.",
     },
   ];
 
@@ -418,6 +460,11 @@ function LandingPage({
       title: "Finance Ministry / RBI",
       icon: "💵",
       description: "Petroleum import bill forecasting for forex reserve planning and current account deficit management",
+    },
+    {
+      title: "State Authorities / SPCBs",
+      icon: "🏛️",
+      description: "State-bound carbon compliance dashboards, cap allocation, audit-ready emission records, and controlled trading oversight",
     },
   ];
 
@@ -489,6 +536,67 @@ function LandingPage({
                   />
                 ))}
               </S.FeaturesGrid>
+            </S.Section>
+          </AnimatedSection>
+
+          {/* Carbon Credit Compliance Section */}
+          <AnimatedSection delay={0.25}>
+            <S.Section>
+              <S.SectionHeader>
+                <S.SectionTitle>
+                  State-Bound Blockchain Carbon Compliance & Credit Exchange for Coal-Based Industries
+                </S.SectionTitle>
+                <S.SectionSubtitle>
+                  A state-level, tamper-proof compliance layer for coal emissions: transparent tracking,
+                  cap allocation, and controlled intra-state credit balancing.
+                </S.SectionSubtitle>
+              </S.SectionHeader>
+
+              <S.FeaturesGrid>
+                {carbonComplianceCards.map((card, index) => (
+                  <FeatureCard
+                    key={card.title}
+                    title={card.title}
+                    icon={card.icon}
+                    description={card.description}
+                    delay={index * 0.08}
+                  />
+                ))}
+              </S.FeaturesGrid>
+
+              <div style={{ height: "1.5rem" }} />
+
+              <S.SectionHeader>
+                <S.SectionTitle>Methodology (IPCC aligned)</S.SectionTitle>
+                <S.SectionSubtitle>
+                  Transparent calculations using standard emission factors and explainable chemistry.
+                </S.SectionSubtitle>
+              </S.SectionHeader>
+
+              <S.FeaturesGrid>
+                {carbonMethodologyCards.map((card, index) => (
+                  <FeatureCard
+                    key={card.title}
+                    title={card.title}
+                    icon={card.icon}
+                    description={card.description}
+                    delay={index * 0.08}
+                  />
+                ))}
+              </S.FeaturesGrid>
+
+              <p
+                style={{
+                  marginTop: "1rem",
+                  textAlign: "center",
+                  color: "var(--color-gray-600)",
+                  fontSize: "0.95rem",
+                  fontWeight: 600,
+                }}
+              >
+                MVP uses a standardized IPCC-aligned average; production can configure emission factor by
+                coal grade/state.
+              </p>
             </S.Section>
           </AnimatedSection>
 

@@ -30,17 +30,28 @@ import type {
   PetroleumProductProductionRecord,
   PetroleumImportExportSnapshotRecord,
   PetroleumTradeRecord,
+  CarbonEmissionRequest,
+  CarbonEmissionResponse,
+  CarbonSubmitCoalDataResponse,
+  CarbonUpdateEmissionRequest,
+  CarbonUpdateEmissionResponse,
+  CarbonTokenBalanceResponse,
+  CarbonIndustryDetailsResponse,
+  CarbonUploadGovtDataResponse,
 } from '../types';
 import type { Role } from '../../components/types';
 
 // const BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://10.10.27.98:8000';
 const BASE_URL = process.env.REACT_APP_API_BASE_URL || 'https://testy-jenny-agriwow-8b798c0c.koyeb.app';
+const CARBON_BASE_URL =
+  process.env.REACT_APP_CARBON_API_BASE_URL ||
+  'https://carbon-credit-api-tkpi.onrender.com';
 const ACCESS_TOKEN_KEY = 'tf_access_token';
 const ROLE_KEY = 'tf_role';
 const STORED_USER_KEY = 'tf_stored_user';
 const SECTOR_KEY = 'tf_sector';
 
-export type UserSector = 'agriculture' | 'petroleum';
+export type UserSector = 'agriculture' | 'petroleum' | 'carbon-credit';
 
 const API_PATHS = {
   register: '/api/v1/auth/register/',
@@ -73,6 +84,15 @@ const API_PATHS = {
     dashboardTradeBalance: '/api/v1/petroleum/dashboard/trade-balance/',
     intelligence: '/api/v1/petroleum/intelligence/',
   },
+} as const;
+
+const CARBON_API_PATHS = {
+  calculateEmission: '/emission/calculate',
+  submitCoalData: '/submit-coal-data',
+  updateEmission: '/emission/update',
+  tokenBalance: (walletAddress: string) => `/token/balance/${walletAddress}`,
+  industry: (walletAddress: string) => `/industry/${walletAddress}`,
+  uploadGovtData: '/upload-govt-data',
 } as const;
 
 export function getAccessToken(): string | null {
@@ -120,7 +140,13 @@ export function clearStoredUser(): void {
 
 export function getStoredSector(): UserSector | null {
   const raw = localStorage.getItem(SECTOR_KEY);
-  if (raw === 'agriculture' || raw === 'petroleum') return raw;
+  if (
+    raw === 'agriculture' ||
+    raw === 'petroleum' ||
+    raw === 'carbon-credit'
+  ) {
+    return raw;
+  }
   return null;
 }
 
@@ -135,6 +161,10 @@ export function clearStoredSector(): void {
 const client = axios.create({
   baseURL: BASE_URL,
   headers: { 'Content-Type': 'application/json' },
+});
+
+const carbonClient = axios.create({
+  baseURL: CARBON_BASE_URL,
 });
 
 const AUTH_HEADER_PREFIX = 'Token';
@@ -525,6 +555,73 @@ export async function getPetroleumTradeBalance(
 export async function getPetroleumIntelligence(): Promise<PetroleumIntelligenceResponse> {
   const { data } = await client.get<PetroleumIntelligenceResponse>(
     API_PATHS.petroleum.intelligence
+  );
+  return data;
+}
+
+/** ---------------- Carbon credit sector APIs ---------------- */
+
+export async function calculateEmission(
+  payload: CarbonEmissionRequest
+): Promise<CarbonEmissionResponse> {
+  const { data } = await carbonClient.post<CarbonEmissionResponse>(
+    CARBON_API_PATHS.calculateEmission,
+    payload
+  );
+  return data;
+}
+
+export async function submitCoalData(
+  payload: CarbonEmissionRequest
+): Promise<CarbonSubmitCoalDataResponse> {
+  const { data } = await carbonClient.post<CarbonSubmitCoalDataResponse>(
+    CARBON_API_PATHS.submitCoalData,
+    payload
+  );
+  return data;
+}
+
+export async function updateIndustryEmission(
+  payload: CarbonUpdateEmissionRequest
+): Promise<CarbonUpdateEmissionResponse> {
+  const { data } = await carbonClient.post<CarbonUpdateEmissionResponse>(
+    CARBON_API_PATHS.updateEmission,
+    payload
+  );
+  return data;
+}
+
+export async function getTokenBalance(
+  walletAddress: string
+): Promise<CarbonTokenBalanceResponse> {
+  const { data } = await carbonClient.get<CarbonTokenBalanceResponse>(
+    CARBON_API_PATHS.tokenBalance(walletAddress)
+  );
+  return data;
+}
+
+export async function getIndustryDetails(
+  walletAddress: string
+): Promise<CarbonIndustryDetailsResponse> {
+  const { data } = await carbonClient.get<CarbonIndustryDetailsResponse>(
+    CARBON_API_PATHS.industry(walletAddress)
+  );
+  return data;
+}
+
+export async function uploadGovtData(
+  file: File
+): Promise<CarbonUploadGovtDataResponse> {
+  const formData = new FormData();
+  formData.append('file', file);
+  const { data } = await carbonClient.post<CarbonUploadGovtDataResponse>(
+    CARBON_API_PATHS.uploadGovtData,
+    formData,
+    {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    }
   );
   return data;
 }

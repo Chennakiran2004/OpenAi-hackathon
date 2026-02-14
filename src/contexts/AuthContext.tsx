@@ -35,6 +35,7 @@ function storedUserToUser(stored: StoredUser, role: Role): User {
 function getRouteForStoredSector(): string {
   const sector = getStoredSector();
   if (sector === "petroleum") return "/petroleum/dashboard";
+  if (sector === "carbon-credit") return "/carbon-credit/dashboard";
   if (sector === "agriculture") return "/dashboard";
   return "/choose-sector";
 }
